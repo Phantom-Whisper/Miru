@@ -18,7 +18,7 @@ The commercial license does NOT grant the right to:
   (except as part of your product).
 
 To obtain a commercial license, contact:
-    phantom-whisper.github.io
+- [Contact me through my portfolio](phantom-whisper.github.io)
 
 This COMMERCIAL LICENSE is the only way to legally use this software
 in a proprietary or commercial context. All other use is subject to GPLv3.
