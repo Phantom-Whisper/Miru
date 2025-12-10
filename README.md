@@ -30,4 +30,4 @@ See:
 - `COMMERCIAL_LICENSE.md` for commercial rights
 
 ## 🕵 Author
-* **Gabriel COUDEL-KOUMBA** - [Phantom-Whisper](https://github.com/Phantom-Whisper)
+<img src="https://avatars.githubusercontent.com/u/157543647?s=400&u=1a9e5f04f782b65bb81c5f4b471495745ad92c25&v=4" width=30> [**Gabriel COUDEL-KOUMBA (Phantom-Whisper)**](https://github.com/Phantom-Whisper)
