@@ -5,7 +5,7 @@
         /// <summary>
         /// Unique identifier for the episode.
         /// </summary>
-        public int Id { get; set; }
+        public Guid Id { get; set; }
 
         /// <summary>
         /// Episode number within the season.
@@ -20,6 +20,6 @@
         /// <summary>
         /// Dureation of the episode in minutes.
         /// </summary>
-        public int Duration { get; set; }
+        public long Duration { get; set; }
     }
 }

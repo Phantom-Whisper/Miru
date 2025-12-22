@@ -10,6 +10,6 @@
         /// <summary>
         /// Duration of the movie in minutes.
         /// </summary>
-        public int Duration { get; set; }
+        public long Duration { get; set; }
     }
 }

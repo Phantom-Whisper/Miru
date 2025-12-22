@@ -5,7 +5,7 @@
         /// <summary>
         /// Unique identifier for the season.
         /// </summary>
-        public int Id { get; set; }
+        public Guid Id { get; set; }
 
         /// <summary>
         /// Season number within the serie.
