@@ -4,6 +4,7 @@
     {
         /// <summary>
         /// Unique identifier for the episode.
+        /// <remarks>This identifier is defined on SeasonId and EpisodeNumber</remarks>
         /// </summary>
         public Guid Id { get; set; }
 
@@ -21,5 +22,10 @@
         /// Dureation of the episode in minutes.
         /// </summary>
         public long Duration { get; set; }
+
+        /// <summary>
+        /// Identifier of the season this episode belongs to.
+        /// </summary>
+        public Guid SeasonId { get; set; }
     }
 }

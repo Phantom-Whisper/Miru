@@ -15,10 +15,15 @@ public abstract class MediaEntity
     /// <summary>
     /// Description of the media.
     /// </summary>
-    public string Description { get; set; }
+    public string? Description { get; set; }
 
     /// <summary>
     /// Poster URL of the media.
     /// </summary>
-    public string PosterUrl { get; set; }
+    public string? PosterUrl { get; set; }
+
+    /// <summary>
+    /// List of media associated with user.
+    /// </summary>
+    public ICollection<MediaEntity> UserMedias { get; set; } = [];
 }

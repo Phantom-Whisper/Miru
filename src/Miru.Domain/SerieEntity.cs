@@ -5,6 +5,6 @@
         /// <summary>
         /// List of seasons in the serie.
         /// </summary>
-        public ICollection<SeasonEntity> Seasons { get; set; } = new List<SeasonEntity>();
+        public ICollection<SeasonEntity> Seasons { get; set; } = [];
     }
 }
