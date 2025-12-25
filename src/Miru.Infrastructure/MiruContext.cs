@@ -5,14 +5,25 @@ namespace Miru.Infrastructure
 {
     public class MiruContext : DbContext
     {
-        public MiruContext(DbContextOptions<MiruContext> options)
-            : base(options)
-        { }
-
         public DbSet<UserEntity> Users => Set<UserEntity>();
         public DbSet<UserMedia> UserMedias => Set<UserMedia>();
         public DbSet<SeasonEntity> Seasons => Set<SeasonEntity>();
         public DbSet<EpisodeEntity> Episodes => Set<EpisodeEntity>();
+
+        public MiruContext() 
+        { }
+
+        public MiruContext(DbContextOptions<MiruContext> options) 
+            : base(options) 
+        { }
+
+        protected override void OnConfiguring(DbContextOptionsBuilder options)
+        {
+            if (!options.IsConfigured)
+            {
+                options.UseSqlServer(@"Server=(localdb)\mssqllocaldb;Database=MiruDb;Trusted_Connection=True;TrustServerCertificate=True;");
+            }
+        }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
