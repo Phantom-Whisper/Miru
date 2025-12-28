@@ -35,11 +35,11 @@
         /// <param name="duration">Duration of the episode.</param>
         /// <param name="seasonId">Season identifier.</param>
         /// <exception cref="ArgumentOutOfRangeException">Thrown if the episode number is lower than zero.</exception>
-        /// <exception cref="ArgumentException">Thrown if title is null or empty, or if duration is less than or equal to zero.</exception>
+        /// <exception cref="ArgumentException">Thrown if title is null or empty, or if duration is less than zero.</exception>
         /// <exception cref="ArgumentException">Thrown if duration is less than or equal to zero.</exception>
         public Episode(int episodeNumber, string title, TimeSpan duration, Guid seasonId)
         {
-            ArgumentOutOfRangeException.ThrowIfNegativeOrZero(episodeNumber);
+            ArgumentOutOfRangeException.ThrowIfNegative(episodeNumber);
             if (string.IsNullOrWhiteSpace(title)) 
                 throw new ArgumentException("Title cannot be null or empty.", nameof(title));
             if (duration <= TimeSpan.Zero) 
