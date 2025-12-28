@@ -7,11 +7,11 @@ namespace Miru.Domain
         /// <summary>
         /// Date and time when the user was created.
         /// </summary>
-        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+        public DateTime CreatedAt { get; private set; } = DateTime.UtcNow;
 
         /// <summary>
         /// List of media associated with the user.
         /// </summary>
-        public ICollection<UserMedia> UserMedias { get; set; } = [];
+        public ICollection<UserMedia> UserMedias { get; private set; } = [];
     }
 }

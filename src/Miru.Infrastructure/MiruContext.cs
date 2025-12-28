@@ -7,8 +7,8 @@ namespace Miru.Infrastructure
     {
         public DbSet<UserEntity> Users => Set<UserEntity>();
         public DbSet<UserMedia> UserMedias => Set<UserMedia>();
-        public DbSet<SeasonEntity> Seasons => Set<SeasonEntity>();
-        public DbSet<EpisodeEntity> Episodes => Set<EpisodeEntity>();
+        public DbSet<Season> Seasons => Set<Season>();
+        public DbSet<Episode> Episodes => Set<Episode>();
 
         public MiruContext() 
         { }
@@ -29,10 +29,10 @@ namespace Miru.Infrastructure
         {
             base.OnModelCreating(modelBuilder);
 
-            modelBuilder.Entity<MediaEntity>()
+            modelBuilder.Entity<Media>()
                 .HasDiscriminator<string>("MediaType")
-                .HasValue<MovieEntity>("Movie")
-                .HasValue<SerieEntity>("Series");
+                .HasValue<Movie>("Movie")
+                .HasValue<Serie>("Series");
 
             modelBuilder.Entity<UserMedia>()
                 .HasKey(um => new { um.UserId, um.MediaId });
