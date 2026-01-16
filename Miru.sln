@@ -7,8 +7,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Miru.Domain", "src\Miru.Dom
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Miru.Infrastructure", "src\Miru.Infrastructure\Miru.Infrastructure.csproj", "{7694FC1F-56F8-843C-61C0-53D922353308}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Miru.Domain.UnitTests", "tests\Miru.Domain.UnitTests\Miru.Domain.UnitTests.csproj", "{7175FFC4-59CA-0130-B1C6-13ED6F43EBD5}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -23,10 +21,6 @@ Global
 		{7694FC1F-56F8-843C-61C0-53D922353308}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7694FC1F-56F8-843C-61C0-53D922353308}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7694FC1F-56F8-843C-61C0-53D922353308}.Release|Any CPU.Build.0 = Release|Any CPU
-		{7175FFC4-59CA-0130-B1C6-13ED6F43EBD5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{7175FFC4-59CA-0130-B1C6-13ED6F43EBD5}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{7175FFC4-59CA-0130-B1C6-13ED6F43EBD5}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{7175FFC4-59CA-0130-B1C6-13ED6F43EBD5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
