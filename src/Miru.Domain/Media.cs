@@ -10,7 +10,7 @@ public abstract class Media
     /// <summary>
     /// Title of the media.
     /// </summary>
-    public string Title { get; protected set; }
+    public string Title { get; protected set; } = null!;
 
     /// <summary>
     /// Description of the media.
@@ -37,47 +37,4 @@ public abstract class Media
     /// Default constructor for ORM.
     /// </summary>
     protected Media() { }
-
-    /// <summary>
-    /// Constructor creating a new Media.
-    /// </summary>
-    /// <param name="title">Title of the media.</param>
-    /// <param name="releaseDate">Release date.</param>
-    /// <param name="description">Optional description.</param>
-    /// <param name="posterUrl">Optional poster URL.</param>
-    /// <exception cref="ArgumentException">Thrown if title is null or empty.</exception>
-    public Media(string title, DateOnly releaseDate, string? description = null, string? posterUrl = null)
-    {
-        if (string.IsNullOrWhiteSpace(title)) 
-            throw new ArgumentException("Title cannot be null or empty.", nameof(title));
-
-        Title = title;
-        Description = description;
-        PosterUrl = posterUrl;
-        ReleaseDate = releaseDate;
-    }
-
-    /// <summary>
-    /// Adds a specific user media to the media.
-    /// </summary>
-    /// <param name="userMedia">The media to add.</param>
-    /// <exception cref="ArgumentNullException">Thrown if the media's null</exception>
-    internal void AddUserMedia(UserMedia userMedia)
-    {
-        if (userMedia == null) 
-            throw new ArgumentNullException(nameof(userMedia), "The media cannot be null.");
-        _userMedias.Add(userMedia);
-    }
-
-    /// <summary>
-    /// Removes a specific user media to the media.
-    /// </summary>
-    /// <param name="userMedia">The media to remove.</param>
-    /// <exception cref="ArgumentNullException">Thrown if the media's null</exception>
-    internal void RemoveUserMedia(UserMedia userMedia)
-    {
-        if (userMedia == null) 
-            throw new ArgumentNullException(nameof(userMedia), "The media cannot be null.");
-        _userMedias.Remove(userMedia);
-    }
 }
