@@ -3,7 +3,8 @@
     public class UserMedia
     {
         private const int MIN_RATING = 0;
-        private const int MAX_RATING = 5;
+        private const int MAX_RATING = 10;
+        
         /// <summary>
         /// Identifier of the user.
         /// <remarks> This identifier is a composite key based on UserId and MediaId.</remarks>

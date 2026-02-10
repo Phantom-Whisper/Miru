@@ -3,6 +3,11 @@
     public class Season
     {
         /// <summary>
+        /// Unique identifier for the season.
+        /// </summary>
+        public Guid Id { get; private set; }
+        
+        /// <summary>
         /// Season number within the serie.
         /// </summary>
         public int SeasonNumber { get; private set; }
@@ -27,5 +32,10 @@
         /// Default constructor for ORM.
         /// </summary>
         protected Season() { }
+        
+        /// <summary>
+        /// Navigation property
+        /// </summary>
+        public Serie Serie { get; private set; } = null!;
     }
 }
