@@ -3,7 +3,8 @@
     public class UserMedia
     {
         private const int MIN_RATING = 0;
-        private const int MAX_RATING = 5;
+        private const int MAX_RATING = 10;
+        
         /// <summary>
         /// Identifier of the user.
         /// <remarks> This identifier is a composite key based on UserId and MediaId.</remarks>
@@ -49,5 +50,34 @@
         /// Default constructor for ORM.
         /// </summary>
         protected UserMedia() { }
+        
+        public static UserMedia Create(Guid userId, Guid mediaId, MediaStatus status)
+        {
+            return new UserMedia
+            {
+                UserId = userId,
+                MediaId = mediaId,
+                Status = status,
+                AddedAt = DateTime.UtcNow
+            };
+        }
+    
+        public void UpdateStatus(MediaStatus status)
+        {
+            Status = status;
+        }
+    
+        public void SetWatchedDate(DateTime watchedAt)
+        {
+            WatchedAt = watchedAt;
+        }
+    
+        public void SetRating(double rating)
+        {
+            if (rating < MIN_RATING || rating > MAX_RATING)
+                throw new ArgumentException($"Rating must be between {MIN_RATING} and {MAX_RATING}");
+        
+            Rating = rating;
+        }
     }
 }
