@@ -12,6 +12,7 @@ namespace Miru.Domain
         /// <summary>
         /// List of media associated with the user.
         /// </summary>
-        public ICollection<UserMedia> UserMedias { get; private set; } = [];
+        private readonly List<Media> _media = [];
+        public IReadOnlyCollection<Media> Media => _media.AsReadOnly();
     }
 }
