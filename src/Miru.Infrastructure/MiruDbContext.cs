@@ -11,7 +11,6 @@ namespace Miru.Infrastructure
         public DbSet<Serie> Series => Set<Serie>();
         public DbSet<Season> Seasons => Set<Season>();
         public DbSet<Episode> Episodes => Set<Episode>();
-        public DbSet<UserMedia> UserMedias => Set<UserMedia>();
 
         public MiruDbContext() 
         { }

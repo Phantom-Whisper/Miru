@@ -22,12 +22,31 @@ public class MediaConfiguration : IEntityTypeConfiguration<Media>
         
         builder.Property(m => m.ReleaseDate)
             .IsRequired();
+        
+        
+        builder.Property(m => m.Status)
+            .IsRequired()
+            .HasConversion<string>();
+        
+        builder.Property(m => m.AddedAt)
+            .IsRequired();
+        
+        builder.Property(m => m.Rating)
+            .HasPrecision(3, 1);
 
+        builder.HasOne(m => m.User)
+            .WithMany(u => u.Media)
+            .HasForeignKey(m => m.UserId)
+            .OnDelete(DeleteBehavior.Cascade);
+        
         builder.HasDiscriminator<string>("MediaType")
             .HasValue<Movie>("Movie")
             .HasValue<Serie>("Serie");
         
         // Indexes
+        builder.HasIndex(m => m.UserId);
+        builder.HasIndex(m => m.Status);
+        builder.HasIndex(m => m.AddedAt);
         builder.HasIndex(m => m.Title);
         builder.HasIndex(m => m.ReleaseDate);
     }

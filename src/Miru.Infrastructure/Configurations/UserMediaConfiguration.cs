@@ -3,7 +3,8 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Miru.Domain;
 
 namespace Miru.Infrastructure.Configurations;
-
+// Commented for now, may be useful in V2
+/*
 public class UserMediaConfiguration : IEntityTypeConfiguration<UserMedia>
 {
     public void Configure(EntityTypeBuilder<UserMedia> builder)
@@ -35,4 +36,4 @@ public class UserMediaConfiguration : IEntityTypeConfiguration<UserMedia>
         builder.HasIndex(um => um.AddedAt);
         builder.HasIndex(um => um.Status);
     }
-}
+}*/

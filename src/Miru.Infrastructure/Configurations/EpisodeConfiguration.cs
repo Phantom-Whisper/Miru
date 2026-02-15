@@ -17,7 +17,22 @@ public class EpisodeConfiguration : IEntityTypeConfiguration<Episode>
         builder.Property(e => e.Duration)
             .IsRequired();
         
+        builder.Property(e => e.EpisodeNumber)
+            .IsRequired();
+        
+        builder.Property(e => e.Watched)
+            .IsRequired();
+        
+        builder.Property(e => e.Rating)
+            .HasPrecision(3, 1);
+        
+        builder.HasOne(e => e.Season)
+            .WithMany(s => s.Episodes)
+            .HasForeignKey(e => e.SeasonId)
+            .OnDelete(DeleteBehavior.Cascade);
+        
         // Indexes
         builder.HasIndex(e => new { e.SeasonId, e.EpisodeNumber }).IsUnique();
+        builder.HasIndex(e => e.Watched);
     }
 }

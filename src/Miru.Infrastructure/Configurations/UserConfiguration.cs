@@ -9,7 +9,6 @@ public class UserConfiguration : IEntityTypeConfiguration<UserEntity>
     public void Configure(EntityTypeBuilder<UserEntity> builder)
     {
         builder.Property(u => u.CreatedAt)
-            .IsRequired()
-            .HasDefaultValueSql("NOW()");
+            .IsRequired();
     }
 }
