@@ -7,7 +7,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Miru.Domain", "src\Miru.Dom
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Miru.Infrastructure", "src\Miru.Infrastructure\Miru.Infrastructure.csproj", "{7694FC1F-56F8-843C-61C0-53D922353308}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Miru.Test", "Miru.Test\Miru.Test.csproj", "{AB7D2579-24E1-436E-B80C-8E471780F955}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Miru.Test", "src/Miru.Test\Miru.Test.csproj", "{AB7D2579-24E1-436E-B80C-8E471780F955}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Miru.Contracts", "Miru.Contracts\Miru.Contracts.csproj", "{53AA3C23-086A-425E-8F74-A6B2CC7EC553}"
 EndProject
