@@ -1,4 +1,4 @@
-﻿namespace Miru.Domain;
+﻿namespace Miru.Domain.Entities;
 
 public abstract class Media
 {
