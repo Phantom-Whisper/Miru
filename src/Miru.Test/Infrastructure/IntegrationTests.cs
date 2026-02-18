@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Miru.Domain;
+using Miru.Domain.Entities;
 using Miru.Infrastructure;
 
 namespace Miru.Test.Infrastructure;
