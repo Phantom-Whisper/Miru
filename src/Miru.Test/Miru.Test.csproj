@@ -29,8 +29,8 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\src\Miru.Domain\Miru.Domain.csproj" />
-      <ProjectReference Include="..\src\Miru.Infrastructure\Miru.Infrastructure.csproj" />
+      <ProjectReference Include="../Miru.Domain\Miru.Domain.csproj" />
+      <ProjectReference Include="../Miru.Infrastructure\Miru.Infrastructure.csproj" />
     </ItemGroup>
 
 </Project>
