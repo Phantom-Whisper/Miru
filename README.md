@@ -60,8 +60,8 @@ product, a separate **commercial license** is required.
 Commercial licensing is available exclusively from the author.
 
 Contact:
-  - phantom-whisper.github.io
+  - [Contact me through my portfolio](phantom-whisper.github.io)
 
 See:
-- `LICENSE` for GPLv3 terms
-- `COMMERCIAL_LICENSE.md` for commercial rights
+- [`LICENSE`](https://github.com/Phantom-Whisper/Miru/blob/a8b72a0c41bca8a11d8badc6b301c854cbfc1469/COMMERCIAL_LICENSE.md) for GPLv3 terms
+- [`COMMERCIAL_LICENSE.md`](https://github.com/Phantom-Whisper/Miru/blob/a8b72a0c41bca8a11d8badc6b301c854cbfc1469/LICENSE) for commercial rights
