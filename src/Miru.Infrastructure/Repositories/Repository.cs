@@ -38,16 +38,13 @@ public class Repository<T> : IRepository<T> where T : class
             query = query.Where(filter);
         }
 
-        foreach (var includeProperty in includeProperties)
-        {
-            query.Include(includeProperty);
-        }
+        query = includeProperties.Aggregate(query, (current, includeProperty) => current.Include(includeProperty));
 
         var totalCount = await query.LongCountAsync(cancellationToken);
 
         if (orderBy is not null)
         {
-            orderBy(query);
+            query = orderBy(query);
         }
 
         var items = await query

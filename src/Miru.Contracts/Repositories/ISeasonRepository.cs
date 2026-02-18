@@ -1,5 +1,4 @@
-﻿using Miru.Domain;
-using Miru.Domain.Entities;
+﻿using Miru.Domain.Entities;
 
 namespace Miru.Contracts.Repositories;
 

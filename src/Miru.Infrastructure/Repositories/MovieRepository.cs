@@ -1,4 +1,5 @@
-﻿using Miru.Contracts.Common;
+﻿using Microsoft.EntityFrameworkCore;
+using Miru.Contracts.Common;
 using Miru.Contracts.Repositories;
 using Miru.Domain;
 using Miru.Domain.Entities;
@@ -68,10 +69,9 @@ public class MovieRepository : Repository<Movie>, IMovieRepository
         int countPerPage = 10,
         CancellationToken cancellationToken = default)
     {
-        var loweredTitle = title.ToLower();
-        
         return await GetItemsAsync(
-            filter: m => m.UserId == userId && (m.Title).Contains(loweredTitle, StringComparison.CurrentCultureIgnoreCase),
+            filter: m => m.UserId == userId &&
+                         EF.Functions.Like(m.Title, $"%{title}%"),
             orderBy: OrderingFactory[orderingCriteria],
             pageIndex: pageIndex,
             countPerPage: countPerPage,
