@@ -8,6 +8,7 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <PackageReference Include="AutoMapper" Version="16.0.0" />
         <PackageReference Include="coverlet.collector" Version="8.0.0"/>
         <PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.3" />
         <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.3">
@@ -31,6 +32,7 @@
     <ItemGroup>
       <ProjectReference Include="../Miru.Domain\Miru.Domain.csproj" />
       <ProjectReference Include="../Miru.Infrastructure\Miru.Infrastructure.csproj" />
+      <ProjectReference Include="..\Miru.Application\Miru.Application.csproj" />
     </ItemGroup>
 
 </Project>
