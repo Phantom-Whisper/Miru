@@ -1,0 +1,22 @@
+﻿namespace Miru.Application.DTOs.Seasons;
+
+/// <summary>
+/// Lightweight season information for lists.
+/// </summary>
+public class SeasonDto
+{
+    /// <summary>
+    /// Unique identifier for the season.
+    /// </summary>
+    public Guid Id { get; set; }
+    
+    /// <summary>
+    /// Season number within the serie.
+    /// </summary>
+    public int SeasonNumber { get; set; }
+    
+    /// <summary>
+    /// Date when the season was released.
+    /// </summary>
+    public DateOnly ReleaseDate { get; set; }
+}
