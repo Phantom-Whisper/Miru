@@ -1,4 +1,6 @@
-﻿namespace Miru.Application.DTOs.Movies;
+﻿using Miru.Domain;
+
+namespace Miru.Application.DTOs.Movies;
 
 /// <summary>
 /// Lightweight movie information for lists.
@@ -23,7 +25,7 @@ public class MovieDto
     /// <summary>
     /// Current status of the movie.
     /// </summary>
-    public string Status { get; set; } = null!;
+    public MediaStatus Status { get; set; }
     
     /// <summary>
     /// Rating given by the user to the movie.

@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using Miru.Domain;
 
 namespace Miru.Application.DTOs.Movies;
 
@@ -11,6 +12,5 @@ public class UpdateMovieStatusDto
     /// New status for the movie (ToWatch, Watching, Watched).
     /// </summary>
     [Required(ErrorMessage = "The field {0} is required")]
-    [RegularExpression("^(ToWatch|Watching|Watched)$",  ErrorMessage = "Invalid status. Must be ToWatch, Watching, or Watched")]
-    public string Status { get; set; } = null!;
+    public MediaStatus Status { get; set; }
 }

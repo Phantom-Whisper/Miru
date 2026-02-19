@@ -1,4 +1,6 @@
-﻿namespace Miru.Application.DTOs.Series;
+﻿using Miru.Domain;
+
+namespace Miru.Application.DTOs.Series;
 
 /// <summary>
 /// Lightweight serie information for lists.
@@ -28,10 +30,30 @@ public class SerieDto
     /// <summary>
     /// Current status of the serie.
     /// </summary>
-    public string Status { get; set; } = null!;
+    public MediaStatus Status { get; set; }
     
     /// <summary>
     /// Rating given by the user to the serie.
     /// </summary>
     public double? Rating { get; set; }
+    
+    /// <summary>
+    /// Total number of seasons.
+    /// </summary>
+    public int SeasonsCount { get; set; }
+    
+    /// <summary>
+    /// Total number of episodes across all seasons.
+    /// </summary>
+    public int TotalEpisodesCount { get; set; }
+    
+    /// <summary>
+    /// Number of watched episodes.
+    /// </summary>
+    public int WatchedEpisodesCount { get; set; }
+    
+    /// <summary>
+    /// Viewing progress percentage (0-100).
+    /// </summary>
+    public double ProgressPercentage { get; set; }
 }
