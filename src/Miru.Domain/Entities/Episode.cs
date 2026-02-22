@@ -58,23 +58,21 @@ public class Episode
     protected Episode() { }
     
     /// <summary>
-    /// Factory method.
+    /// Creates a new <see cref="Episode"/>.
     /// </summary>
-    /// <param name="episodeNumber"></param>
-    /// <param name="title"></param>
-    /// <param name="duration"></param>
-    /// <param name="seasonId"></param>
-    /// <returns></returns>
+    /// <exception cref="DomainException">
+    /// Thrown when parameters are invalid.
+    /// </exception>
     public static Episode Create(int episodeNumber, string title, TimeSpan duration, Guid seasonId)
     {
         if (episodeNumber <= 0)
-            throw new ArgumentException("Episode number must be positive");
+            throw new DomainException("Episode number must be positive");
 
         if (string.IsNullOrWhiteSpace(title))
-            throw new ArgumentException("Title is required");
+            throw new DomainException("Title is required");
 
         if (duration <= TimeSpan.Zero)
-            throw new ArgumentException("Duration must be positive");
+            throw new DomainException("Duration must be positive");
 
         if (seasonId == Guid.Empty)
             throw new DomainException("SeasonId cannot be empty");
@@ -92,7 +90,7 @@ public class Episode
     // Utility methods
     
     /// <summary>
-    /// Marks the episode as watched.
+    /// Marks the episode as watched and sets the watched date to now (UTC).
     /// </summary>
     public void MarkAsWatched()
     {
@@ -101,7 +99,7 @@ public class Episode
     }
     
     /// <summary>
-    /// Marks the episode as unwatched.
+    /// Marks the episode as not watched and clears the watched date.
     /// </summary>
     public void MarkAsUnwatched()
     {
@@ -113,12 +111,54 @@ public class Episode
     /// Sets the episode rating given by the user.
     /// </summary>
     /// <param name="rating">User rating.</param>
-    /// <exception cref="ArgumentException">Thrown if the user rating is lower than 0 or higher than 10.</exception>
+    /// <exception cref="DomainException">Thrown if the user rating is lower than 0 or higher than 10.</exception>
     public void SetRating(double rating)
     {
         if (rating is < MinRating or > MaxRating)
-            throw new ArgumentException("Rating must be between 0 and 10");
+            throw new DomainException("Rating must be between 0 and 10");
         
         Rating = rating;
+    }
+
+    /// <summary>
+    /// Updates the episode duration.
+    /// </summary>
+    /// <exception cref="DomainException">
+    /// Thrown if duration is not positive.
+    /// </exception>
+    public void UpdateDuration(TimeSpan duration)
+    {
+        if (duration <= TimeSpan.Zero)
+            throw new DomainException("Duration must be positive");
+
+        Duration = duration;
+    }
+
+    /// <summary>
+    /// Updates the episode title.
+    /// </summary>
+    /// <exception cref="DomainException">
+    /// Thrown when title is null or empty.
+    /// </exception>
+    public void UpdateTitle(string title)
+    {
+        if (string.IsNullOrWhiteSpace(title))
+            throw new DomainException("Title is required");
+
+        Title = title;
+    }
+
+    /// <summary>
+    /// Updates the episode number.
+    /// </summary>
+    /// <exception cref="DomainException">
+    /// Thrown when episode number is not positive.
+    /// </exception>
+    public void UpdateEpisodeNumber(int episodeNumber)
+    {
+        if (episodeNumber <= 0)
+            throw new DomainException("Episode number must be positive");
+
+        EpisodeNumber = episodeNumber;
     }
 }

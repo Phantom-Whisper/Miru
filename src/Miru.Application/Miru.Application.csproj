@@ -7,14 +7,11 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <Folder Include="Services\" />
-    </ItemGroup>
-
-    <ItemGroup>
       <PackageReference Include="AutoMapper" Version="16.0.0" />
     </ItemGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\Miru.Contracts\Miru.Contracts.csproj" />
       <ProjectReference Include="..\Miru.Domain\Miru.Domain.csproj" />
     </ItemGroup>
 
