@@ -35,6 +35,15 @@ public class Season
     /// </summary>
     protected Season() { }
     
+    /// <summary>
+    /// Creates a new <see cref="Season"/>.
+    /// </summary>
+    /// <param name="seasonNumber">Season number (must be positive).</param>
+    /// <param name="releaseDate">Release date of the season.</param>
+    /// <param name="serieId">Identifier of the parent series.</param>
+    /// <exception cref="DomainException">
+    /// Thrown when parameters are invalid.
+    /// </exception>
     public static Season Create(int seasonNumber, DateOnly releaseDate, Guid serieId)
     {
         if (seasonNumber <= 0)
@@ -52,6 +61,14 @@ public class Season
         };
     }
 
+    /// <summary>
+    /// Adds an episode to the season.
+    /// </summary>
+    /// <param name="episode">Episode to add.</param>
+    /// <exception cref="DomainException">
+    /// Thrown if the episode is null, does not belong to this season,
+    /// or if an episode with the same number already exists.
+    /// </exception>
     public void AddEpisode(Episode episode)
     {
         if (episode == null)
@@ -70,4 +87,34 @@ public class Season
     /// Navigation property
     /// </summary>
     public Serie Serie { get; private set; } = null!;
+
+    /// <summary>
+    /// Updates the release date of the season.
+    /// </summary>
+    /// <param name="releaseDate">New release date.</param>
+    /// <exception cref="DomainException">
+    /// Thrown if the release date is in the future.
+    /// </exception>
+    public void UpdateReleaseDate(DateOnly releaseDate)
+    {
+        if (releaseDate > DateOnly.FromDateTime(DateTime.UtcNow))
+            throw new DomainException("Release date cannot be in the future");
+
+        ReleaseDate = releaseDate;
+    }
+
+    /// <summary>
+    /// Updates the season number.
+    /// </summary>
+    /// <param name="seasonNumber">New season number (must be positive).</param>
+    /// <exception cref="DomainException">
+    /// Thrown if the season number is not positive.
+    /// </exception>
+    public void UpdateSeasonNumber(int seasonNumber)
+    {
+        if (seasonNumber <= 0)
+            throw new DomainException("Season number must be positive");
+
+        SeasonNumber = seasonNumber;
+    }
 }
