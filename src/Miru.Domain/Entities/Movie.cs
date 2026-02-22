@@ -46,4 +46,77 @@ public class Movie : Media
             PosterUrl = posterUrl
         };
     }
+    
+    /// <summary>
+    /// Updates the movie title.
+    /// </summary>
+    /// <param name="title">The new title of the movie.</param>
+    /// <exception cref="DomainException">
+    /// Thrown when the title is null, empty, or whitespace.
+    /// </exception>
+    public void UpdateTitle(string title)
+    {
+        if (string.IsNullOrWhiteSpace(title))
+            throw new DomainException("Title is required");
+
+        Title = title;
+    }
+
+    /// <summary>
+    /// Updates the movie duration.
+    /// </summary>
+    /// <param name="duration">The new duration of the movie.</param>
+    /// <exception cref="DomainException">
+    /// Thrown when the duration is less than or equal to zero.
+    /// </exception>
+    public void UpdateDuration(TimeSpan duration)
+    {
+        if (duration <= TimeSpan.Zero)
+            throw new DomainException("Duration must be positive");
+
+        Duration = duration;
+    }
+
+    /// <summary>
+    /// Updates the release date of the movie.
+    /// </summary>
+    /// <param name="releaseDate">The new release date.</param>
+    /// <exception cref="DomainException">
+    /// Thrown when the release date is in the future.
+    /// </exception>
+    public void UpdateReleaseDate(DateOnly releaseDate)
+    {
+        if (releaseDate > DateOnly.FromDateTime(DateTime.UtcNow))
+            throw new DomainException("Release date cannot be in the future");
+
+        ReleaseDate = releaseDate;
+    }
+
+    /// <summary>
+    /// Updates the movie description.
+    /// </summary>
+    /// <param name="description">
+    /// The new description. Can be null to remove the current description.
+    /// </param>
+    public void UpdateDescription(string? description)
+    {
+        Description = description;
+    }
+
+    /// <summary>
+    /// Updates the poster URL of the movie.
+    /// </summary>
+    /// <param name="posterUrl">
+    /// The new poster URL. Cannot be null or whitespace.
+    /// </param>
+    /// <exception cref="DomainException">
+    /// Thrown when the poster URL is empty or whitespace.
+    /// </exception>
+    public void UpdatePosterUrl(string posterUrl)
+    {
+        if (string.IsNullOrWhiteSpace(posterUrl))
+            throw new DomainException("Poster URL cannot be empty");
+
+        PosterUrl = posterUrl;
+    }
 }

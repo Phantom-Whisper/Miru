@@ -1,0 +1,78 @@
+﻿using Miru.Contracts.Common;
+using Miru.Contracts.DTOs.Episodes;
+
+namespace Miru.Contracts.Services;
+
+public interface IEpisodeService
+{
+    Task<PagingResult<EpisodeDto>> GetEpisodesBySeasonIdAsync(
+        Guid userId,
+        Guid serieId,
+        Guid seasonId,
+        EpisodeOrderingCriteria orderingCriteria = EpisodeOrderingCriteria.ByEpisodeNumber,
+        int pageIndex = 0,
+        int countPerPage = 50,
+        CancellationToken cancellationToken = default);
+    
+    Task<EpisodeDto?> GetEpisodeByIdAsync(
+        Guid userId,
+        Guid serieId,
+        Guid seasonId,
+        Guid episodeId,
+        CancellationToken cancellationToken = default);
+    
+    Task<EpisodeDto> AddEpisodeToSeasonAsync(
+        Guid userId,
+        Guid serieId,
+        Guid seasonId,
+        CreateEpisodeDto createEpisodeDto,
+        CancellationToken cancellationToken = default);
+    
+    Task<EpisodeDto> UpdateEpisodeAsync(
+        Guid userId,
+        Guid serieId,
+        Guid seasonId,
+        Guid episodeId,
+        UpdateEpisodeDto updateEpisodeDto,
+        CancellationToken cancellationToken = default);
+    
+    Task MarkEpisodeAsWatchedAsync(
+        Guid userId,
+        Guid serieId,
+        Guid seasonId,
+        Guid episodeId,
+        CancellationToken cancellationToken = default);
+    
+    Task MarkEpisodeAsUnwatchedAsync(
+        Guid userId,
+        Guid serieId,
+        Guid seasonId,
+        Guid episodeId,
+        CancellationToken cancellationToken = default);
+    
+    Task RateEpisodeAsync(
+        Guid userId,
+        Guid serieId,
+        Guid seasonId,
+        Guid episodeId,
+        double rating,
+        CancellationToken cancellationToken = default);
+    
+    Task DeleteEpisodeAsync(
+        Guid userId,
+        Guid serieId,
+        Guid seasonId,
+        Guid episodeId,
+        CancellationToken cancellationToken = default);
+    
+    Task<EpisodeDto?> GetNextUnwatchedEpisodeAsync(
+        Guid userId,
+        Guid serieId,
+        CancellationToken cancellationToken = default);
+    
+    Task<PagingResult<EpisodeDto>> GetRecentlyWatchedEpisodesAsync(
+        Guid userId,
+        int pageIndex = 0,
+        int countPerPage = 10,
+        CancellationToken cancellationToken = default);
+}

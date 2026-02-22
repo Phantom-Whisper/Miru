@@ -1,5 +1,6 @@
 ﻿namespace Miru.Domain.Entities;
 
+// May be used in later version
 public class UserMedia
 {
     private const int MIN_RATING = 0;
