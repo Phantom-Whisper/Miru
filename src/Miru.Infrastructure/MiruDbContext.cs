@@ -15,12 +15,32 @@ namespace Miru.Infrastructure
         public MiruDbContext() 
         { }
 
-        public MiruDbContext(DbContextOptions<MiruDbContext> options) 
-            : base(options) 
-        { }
+        public MiruDbContext(DbContextOptions<MiruDbContext> options)
+            : base(options)
+        {
+            // Database.EnsureCreated(); 
+        }
 
         protected override void OnConfiguring(DbContextOptionsBuilder options)
         {
+        }
+
+        private static readonly PasswordHasher<UserEntity> PasswordHasher = new PasswordHasher<UserEntity>();
+        
+        UserEntity CreateUser(Guid id, string email, string password)
+        {
+            UserEntity user = new UserEntity
+            {
+                Id = id,
+                Email = email,
+                EmailConfirmed = true,
+                UserName = email,
+                NormalizedEmail = email.ToUpper(),
+                NormalizedUserName = email.ToUpper(),
+            };
+            
+            user.PasswordHash = PasswordHasher.HashPassword(user, password);
+            return user;
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

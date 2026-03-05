@@ -7,11 +7,13 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Miru.Domain", "src\Miru.Dom
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Miru.Infrastructure", "src\Miru.Infrastructure\Miru.Infrastructure.csproj", "{7694FC1F-56F8-843C-61C0-53D922353308}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Miru.Test", "src/Miru.Test\Miru.Test.csproj", "{AB7D2579-24E1-436E-B80C-8E471780F955}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Miru.Test", "src\Miru.Test\Miru.Test.csproj", "{AB7D2579-24E1-436E-B80C-8E471780F955}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Miru.Contracts", "src/Miru.Contracts\Miru.Contracts.csproj", "{53AA3C23-086A-425E-8F74-A6B2CC7EC553}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Miru.Contracts", "src\Miru.Contracts\Miru.Contracts.csproj", "{53AA3C23-086A-425E-8F74-A6B2CC7EC553}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Miru.Application", "src\Miru.Application\Miru.Application.csproj", "{B00FCE52-1DEC-488C-8125-AF91E8708199}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Miru.Api", "src\Miru.Api\Miru.Api.csproj", "{9706DA8B-2FBC-4664-9C0D-3F6EFBDB3BEE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -39,6 +41,10 @@ Global
 		{B00FCE52-1DEC-488C-8125-AF91E8708199}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B00FCE52-1DEC-488C-8125-AF91E8708199}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B00FCE52-1DEC-488C-8125-AF91E8708199}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9706DA8B-2FBC-4664-9C0D-3F6EFBDB3BEE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9706DA8B-2FBC-4664-9C0D-3F6EFBDB3BEE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9706DA8B-2FBC-4664-9C0D-3F6EFBDB3BEE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9706DA8B-2FBC-4664-9C0D-3F6EFBDB3BEE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
