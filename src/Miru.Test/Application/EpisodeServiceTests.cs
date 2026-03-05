@@ -5,6 +5,7 @@ using Miru.Contracts.Common;
 using Miru.Contracts.DTOs.Episodes;
 using Miru.Contracts.Persistence;
 using Miru.Contracts.Repositories;
+using Miru.Contracts.Services;
 using Miru.Domain.Entities;
 using Moq;
 
@@ -18,6 +19,7 @@ public class EpisodeServiceTests
     private readonly Mock<ISeasonRepository> _mockSeasonRepo;
     private readonly Mock<ISerieRepository> _mockSerieRepo;
     private readonly EpisodeService _episodeService;
+    private readonly Guid _userId;
 
     public EpisodeServiceTests()
     {
@@ -26,22 +28,31 @@ public class EpisodeServiceTests
         _mockEpisodeRepo = new Mock<IEpisodeRepository>();
         _mockSeasonRepo = new Mock<ISeasonRepository>();
         _mockSerieRepo = new Mock<ISerieRepository>();
+        var mockCurrentUser = new Mock<ICurrentUserService>();
+
+        _userId = Guid.NewGuid();
+
+        mockCurrentUser
+            .Setup(x => x.UserId)
+            .Returns(_userId);
 
         _mockUnitOfWork.Setup(u => u.Episodes).Returns(_mockEpisodeRepo.Object);
         _mockUnitOfWork.Setup(u => u.Seasons).Returns(_mockSeasonRepo.Object);
         _mockUnitOfWork.Setup(u => u.Series).Returns(_mockSerieRepo.Object);
 
-        _episodeService = new EpisodeService(_mockUnitOfWork.Object, _mockMapper.Object);
+        _episodeService = new EpisodeService(
+            _mockUnitOfWork.Object,
+            _mockMapper.Object,
+            mockCurrentUser.Object);
     }
 
     [Fact]
     public async Task GetEpisodesBySeasonIdAsync_ReturnsMappedPagingResult()
     {
-        var userId = Guid.NewGuid();
         var serieId = Guid.NewGuid();
         var seasonId = Guid.NewGuid();
 
-        var serie = Serie.Create(userId, "Serie", new DateOnly(2024, 1, 1));
+        var serie = Serie.Create(_userId, "Serie", new DateOnly(2024, 1, 1));
         var season = Season.Create(1, new DateOnly(2024, 1, 1), serieId);
 
         var episodes = new List<Episode>
@@ -66,7 +77,7 @@ public class EpisodeServiceTests
         _mockMapper.Setup(m => m.Map<IEnumerable<EpisodeDto>>(episodes))
             .Returns(episodes.Select(e => new EpisodeDto { Id = e.Id, Title = e.Title }));
 
-        var result = await _episodeService.GetEpisodesBySeasonIdAsync(userId, serieId, seasonId, EpisodeOrderingCriteria.ByEpisodeNumber, 0, 10);
+        var result = await _episodeService.GetEpisodesBySeasonIdAsync(serieId, seasonId, EpisodeOrderingCriteria.ByEpisodeNumber, 0, 10);
 
         Assert.Equal(2, result.TotalCount);
         Assert.Equal(2, result.Items.Count());
@@ -75,11 +86,10 @@ public class EpisodeServiceTests
     [Fact]
     public async Task GetEpisodeByIdAsync_ReturnsEpisodeDto_WhenEpisodeExists()
     {
-        var userId = Guid.NewGuid();
         var serieId = Guid.NewGuid();
         var seasonId = Guid.NewGuid();
 
-        var serie = Serie.Create(userId, "Serie", new DateOnly(2024, 1, 1));
+        var serie = Serie.Create(_userId, "Serie", new DateOnly(2024, 1, 1));
         var season = Season.Create(1, new DateOnly(2024, 1, 1), serieId);
         var episode = Episode.Create(1, "Ep1", TimeSpan.FromMinutes(45), seasonId);
 
@@ -89,7 +99,7 @@ public class EpisodeServiceTests
 
         _mockMapper.Setup(m => m.Map<EpisodeDto>(episode)).Returns(new EpisodeDto { Id = episode.Id, Title = episode.Title });
 
-        var result = await _episodeService.GetEpisodeByIdAsync(userId, serieId, seasonId, episode.Id);
+        var result = await _episodeService.GetEpisodeByIdAsync(serieId, seasonId, episode.Id);
 
         Assert.NotNull(result);
         Assert.Equal("Ep1", result.Title);
@@ -98,25 +108,22 @@ public class EpisodeServiceTests
     [Fact]
     public async Task GetEpisodeByIdAsync_WrongUser_ThrowsForbiddenException()
     {
-        var userId = Guid.NewGuid();
-        var wrongUserId = Guid.NewGuid();
         var serieId = Guid.NewGuid();
         var seasonId = Guid.NewGuid();
 
-        var serie = Serie.Create(userId, "Serie", new DateOnly(2024, 1, 1));
+        var serie = Serie.Create(Guid.NewGuid(), "Serie", new DateOnly(2024, 1, 1));
         _mockSerieRepo.Setup(r => r.GetByIdAsync(serieId, It.IsAny<CancellationToken>())).ReturnsAsync(serie);
 
         await Assert.ThrowsAsync<ForbiddenException>(() =>
-            _episodeService.GetEpisodeByIdAsync(wrongUserId, serieId, seasonId, Guid.NewGuid()));
+            _episodeService.GetEpisodeByIdAsync(serieId, seasonId, Guid.NewGuid()));
     }
 
     [Fact]
     public async Task AddEpisodeToSeasonAsync_AddsEpisodeSuccessfully()
     {
-        var userId = Guid.NewGuid();
         var serieId = Guid.NewGuid();
 
-        var serie = Serie.Create(userId, "Serie", new DateOnly(2024, 1, 1));
+        var serie = Serie.Create(_userId, "Serie", new DateOnly(2024, 1, 1));
         var season = Season.Create(1, new DateOnly(2024, 1, 1), serieId);
         var seasonId = season.Id;
 
@@ -129,7 +136,7 @@ public class EpisodeServiceTests
 
         var createDto = new CreateEpisodeDto { EpisodeNumber = 1, Title = "Ep1", DurationMinutes = 45 };
 
-        var result = await _episodeService.AddEpisodeToSeasonAsync(userId, serieId, seasonId, createDto);
+        var result = await _episodeService.AddEpisodeToSeasonAsync(serieId, seasonId, createDto);
 
         Assert.Equal("Ep1", result.Title);
         Assert.Single(season.Episodes);
@@ -140,10 +147,9 @@ public class EpisodeServiceTests
     [Fact]
     public async Task AddEpisodeToSeasonAsync_DuplicateEpisode_ThrowsValidationException()
     {
-        var userId = Guid.NewGuid();
         var serieId = Guid.NewGuid();
 
-        var serie = Serie.Create(userId, "Serie", new DateOnly(2024, 1, 1));
+        var serie = Serie.Create(_userId, "Serie", new DateOnly(2024, 1, 1));
         var season = Season.Create(1, new DateOnly(2024, 1, 1), serieId);
         var seasonId = season.Id;
 
@@ -156,17 +162,16 @@ public class EpisodeServiceTests
         var createDto = new CreateEpisodeDto { EpisodeNumber = 1, Title = "Ep1", DurationMinutes = 45 };
 
         await Assert.ThrowsAsync<ValidationException>(() =>
-            _episodeService.AddEpisodeToSeasonAsync(userId, serieId, seasonId, createDto));
+            _episodeService.AddEpisodeToSeasonAsync(serieId, seasonId, createDto));
     }
 
     [Fact]
     public async Task UpdateEpisodeAsync_UpdatesFieldsSuccessfully()
     {
-        var userId = Guid.NewGuid();
         var serieId = Guid.NewGuid();
         var seasonId = Guid.NewGuid();
 
-        var serie = Serie.Create(userId, "Serie", new DateOnly(2024, 1, 1));
+        var serie = Serie.Create(_userId, "Serie", new DateOnly(2024, 1, 1));
         var season = Season.Create(1, new DateOnly(2024, 1, 1), serieId);
         var episode = Episode.Create(1, "Ep1", TimeSpan.FromMinutes(45), seasonId);
 
@@ -179,7 +184,7 @@ public class EpisodeServiceTests
 
         var updateDto = new UpdateEpisodeDto { Title = "Updated", DurationMinutes = 50, EpisodeNumber = 2 };
 
-        var result = await _episodeService.UpdateEpisodeAsync(userId, serieId, seasonId, episode.Id, updateDto);
+        var result = await _episodeService.UpdateEpisodeAsync(serieId, seasonId, episode.Id, updateDto);
 
         Assert.Equal("Updated", result.Title);
         Assert.Equal(2, episode.EpisodeNumber);
@@ -189,12 +194,11 @@ public class EpisodeServiceTests
     [Fact]
     public async Task DeleteEpisodeAsync_RemovesEpisode()
     {
-        var userId = Guid.NewGuid();
         var serieId = Guid.NewGuid();
         var seasonId = Guid.NewGuid();
         var episode = Episode.Create(1, "Ep1", TimeSpan.FromMinutes(45), seasonId);
 
-        var serie = Serie.Create(userId, "Serie", new DateOnly(2024, 1, 1));
+        var serie = Serie.Create(_userId, "Serie", new DateOnly(2024, 1, 1));
         var season = Season.Create(1, new DateOnly(2024, 1, 1), serieId);
 
         _mockSerieRepo.Setup(r => r.GetByIdAsync(serieId, It.IsAny<CancellationToken>())).ReturnsAsync(serie);
@@ -202,7 +206,7 @@ public class EpisodeServiceTests
         _mockEpisodeRepo.Setup(r => r.GetByIdAsync(episode.Id, It.IsAny<CancellationToken>())).ReturnsAsync(episode);
         _mockUnitOfWork.Setup(u => u.SaveChangesAsync(It.IsAny<CancellationToken>())).ReturnsAsync(1);
 
-        await _episodeService.DeleteEpisodeAsync(userId, serieId, seasonId, episode.Id);
+        await _episodeService.DeleteEpisodeAsync(serieId, seasonId, episode.Id);
 
         _mockEpisodeRepo.Verify(r => r.Delete(episode), Times.Once);
         _mockUnitOfWork.Verify(u => u.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);
@@ -211,11 +215,10 @@ public class EpisodeServiceTests
     [Fact]
     public async Task DeleteEpisodeAsync_EpisodeNotFound_ThrowsNotFoundException()
     {
-        var userId = Guid.NewGuid();
         var seasonId = Guid.NewGuid();
         var episodeId = Guid.NewGuid();
 
-        var serie = Serie.Create(userId, "Serie", new DateOnly(2024, 1, 1));
+        var serie = Serie.Create(_userId, "Serie", new DateOnly(2024, 1, 1));
         var serieId = serie.Id;
         var season = Season.Create(1, new DateOnly(2024, 1, 1), serie.Id);
 
@@ -224,6 +227,6 @@ public class EpisodeServiceTests
         _mockEpisodeRepo.Setup(r => r.GetByIdAsync(episodeId, It.IsAny<CancellationToken>())).ReturnsAsync((Episode?)null);
 
         await Assert.ThrowsAsync<NotFoundException>(() =>
-            _episodeService.DeleteEpisodeAsync(userId, serieId, seasonId, episodeId));
+            _episodeService.DeleteEpisodeAsync(serieId, seasonId, episodeId));
     }
 }

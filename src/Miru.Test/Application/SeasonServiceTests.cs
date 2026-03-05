@@ -4,6 +4,7 @@ using Miru.Application.Services;
 using Miru.Contracts.DTOs.Seasons;
 using Miru.Contracts.Persistence;
 using Miru.Contracts.Repositories;
+using Miru.Contracts.Services;
 using Miru.Domain.Entities;
 using Moq;
 
@@ -16,6 +17,7 @@ public class SeasonServiceTests
     private readonly Mock<ISeasonRepository> _mockSeasonRepository;
     private readonly Mock<IEpisodeRepository> _mockEpisodeRepository;
     private readonly Mock<IMapper> _mockMapper;
+    private readonly Guid _userId;
 
     private readonly SeasonService _seasonService;
 
@@ -25,20 +27,25 @@ public class SeasonServiceTests
         _mockSerieRepository = new Mock<ISerieRepository>();
         _mockSeasonRepository = new Mock<ISeasonRepository>();
         _mockEpisodeRepository = new Mock<IEpisodeRepository>();
+        var mockCurrentUser = new Mock<ICurrentUserService>();
         _mockMapper = new Mock<IMapper>();
+        _userId = Guid.NewGuid();
+
+        mockCurrentUser
+            .Setup(x => x.UserId)
+            .Returns(_userId);
 
         _mockUnitOfWork.Setup(u => u.Series).Returns(_mockSerieRepository.Object);
         _mockUnitOfWork.Setup(u => u.Seasons).Returns(_mockSeasonRepository.Object);
         _mockUnitOfWork.Setup(u => u.Episodes).Returns(_mockEpisodeRepository.Object);
 
-        _seasonService = new SeasonService(_mockUnitOfWork.Object, _mockMapper.Object);
+        _seasonService = new SeasonService(_mockUnitOfWork.Object, _mockMapper.Object, mockCurrentUser.Object);
     }
 
     [Fact]
     public async Task GetSeasonsBySerieIdAsync_ReturnsSeasons()
     {
-        var userId = Guid.NewGuid();
-        var serie = Serie.Create(userId, "Breaking Bad", new DateOnly(2008, 1, 1));
+        var serie = Serie.Create(_userId, "Breaking Bad", new DateOnly(2008, 1, 1));
         var seasons = new List<Season>
         {
             Season.Create(1, new DateOnly(2008,1,1), serie.Id),
@@ -56,7 +63,7 @@ public class SeasonServiceTests
         _mockMapper.Setup(m => m.Map<IEnumerable<SeasonDto>>(seasons))
             .Returns(seasonDtos);
 
-        var result = await _seasonService.GetSeasonsBySerieIdAsync(userId, serie.Id);
+        var result = await _seasonService.GetSeasonsBySerieIdAsync(serie.Id);
 
         Assert.Equal(2, result.Count());
     }
@@ -70,14 +77,13 @@ public class SeasonServiceTests
             .ReturnsAsync(serie);
 
         await Assert.ThrowsAsync<ForbiddenException>(
-            () => _seasonService.GetSeasonsBySerieIdAsync(Guid.NewGuid(), serie.Id));
+            () => _seasonService.GetSeasonsBySerieIdAsync(serie.Id));
     }
 
     [Fact]
     public async Task AddSeasonToSerieAsync_Valid_ReturnsSeasonDetails()
     {
-        var userId = Guid.NewGuid();
-        var serie = Serie.Create(userId, "Lost", new DateOnly(2004, 1, 1));
+        var serie = Serie.Create(_userId, "Lost", new DateOnly(2004, 1, 1));
 
         var createDto = new CreateSeasonDto
         {
@@ -109,7 +115,6 @@ public class SeasonServiceTests
             .ReturnsAsync(1);
 
         var result = await _seasonService.AddSeasonToSerieAsync(
-            userId,
             serie.Id,
             createDto,
             CancellationToken.None);
@@ -124,8 +129,7 @@ public class SeasonServiceTests
     [Fact]
     public async Task AddSeasonToSerieAsync_DuplicateSeason_ThrowsValidation()
     {
-        var userId = Guid.NewGuid();
-        var serie = Serie.Create(userId, "Test", new DateOnly(2020, 1, 1));
+        var serie = Serie.Create(_userId, "Test", new DateOnly(2020, 1, 1));
         var existing = Season.Create(1, new DateOnly(2020,1,1), serie.Id);
         serie.AddSeason(existing);
 
@@ -139,14 +143,13 @@ public class SeasonServiceTests
             .ReturnsAsync(serie);
 
         await Assert.ThrowsAsync<ValidationException>(
-            () => _seasonService.AddSeasonToSerieAsync(userId, serie.Id, dto));
+            () => _seasonService.AddSeasonToSerieAsync(serie.Id, dto));
     }
     
     [Fact]
     public async Task UpdateSeasonAsync_Valid_UpdatesSeason()
     {
-        var userId = Guid.NewGuid();
-        var serie = Serie.Create(userId, "Dark", new DateOnly(2017,1,1));
+        var serie = Serie.Create(_userId, "Dark", new DateOnly(2017,1,1));
         var season = Season.Create(1, new DateOnly(2017,1,1), serie.Id);
 
         var dto = new UpdateSeasonDto
@@ -166,7 +169,7 @@ public class SeasonServiceTests
         _mockUnitOfWork.Setup(u => u.SaveChangesAsync(It.IsAny<CancellationToken>()))
             .ReturnsAsync(1);
 
-        await _seasonService.UpdateSeasonAsync(userId, serie.Id, season.Id, dto);
+        await _seasonService.UpdateSeasonAsync(serie.Id, season.Id, dto);
 
         Assert.Equal(2, season.SeasonNumber);
         _mockSeasonRepository.Verify(r => r.Update(season), Times.Once);
@@ -175,8 +178,7 @@ public class SeasonServiceTests
     [Fact]
     public async Task DeleteSeasonAsync_Valid_DeletesSeason()
     {
-        var userId = Guid.NewGuid();
-        var serie = Serie.Create(userId, "BB", new DateOnly(2008,1,1));
+        var serie = Serie.Create(_userId, "BB", new DateOnly(2008,1,1));
         var season = Season.Create(1, new DateOnly(2008,1,1), serie.Id);
 
         _mockSerieRepository.Setup(r => r.GetByIdAsync(serie.Id, It.IsAny<CancellationToken>()))
@@ -188,7 +190,7 @@ public class SeasonServiceTests
         _mockUnitOfWork.Setup(u => u.SaveChangesAsync(It.IsAny<CancellationToken>()))
             .ReturnsAsync(1);
 
-        await _seasonService.DeleteSeasonAsync(userId, serie.Id, season.Id);
+        await _seasonService.DeleteSeasonAsync(serie.Id, season.Id);
 
         _mockSeasonRepository.Verify(r => r.Delete(season), Times.Once);
         _mockUnitOfWork.Verify(u => u.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);
@@ -197,8 +199,7 @@ public class SeasonServiceTests
     [Fact]
     public async Task MarkSeasonAsWatchedAsync_MarksAllEpisodes()
     {
-        var userId = Guid.NewGuid();
-        var serie = Serie.Create(userId, "Test", new DateOnly(2020,1,1));
+        var serie = Serie.Create(_userId, "Test", new DateOnly(2020,1,1));
         var season = Season.Create(1, new DateOnly(2020,1,1), serie.Id);
 
         var episode1 = Episode.Create(1, "Ep1", TimeSpan.FromMinutes(40), season.Id);
@@ -216,7 +217,7 @@ public class SeasonServiceTests
         _mockUnitOfWork.Setup(u => u.SaveChangesAsync(It.IsAny<CancellationToken>()))
             .ReturnsAsync(1);
 
-        await _seasonService.MarkSeasonAsWatchedAsync(userId, serie.Id, season.Id);
+        await _seasonService.MarkSeasonAsWatchedAsync(serie.Id, season.Id);
 
         Assert.True(episode1.Watched);
         Assert.True(episode2.Watched);

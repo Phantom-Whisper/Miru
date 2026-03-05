@@ -9,25 +9,17 @@ using Miru.Domain.Entities;
 
 namespace Miru.Application.Services;
 
-public class SerieService : ISerieService
+public class SerieService(IUnitOfWork unitOfWork, IMapper mapper, ICurrentUserService currentUserService)
+    : ISerieService
 {
-    private readonly IUnitOfWork _unitOfWork;
-    private readonly IMapper _mapper;
-    
-    public SerieService(IUnitOfWork unitOfWork, IMapper mapper)
-    {
-        _unitOfWork = unitOfWork;
-        _mapper = mapper;
-    }
-    
     public async Task<PagingResult<SerieDto>> GetSeriesAsync(
-        Guid userId,
         SerieOrderingCriteria orderingCriteria = SerieOrderingCriteria.None,
         int pageIndex = 0,
         int countPerPage = 10,
         CancellationToken cancellationToken = default)
     {
-        var result = await _unitOfWork.Series.GetSeriesAsync(
+        var userId = currentUserService.UserId;
+        var result = await unitOfWork.Series.GetSeriesAsync(
             userId,
             orderingCriteria,
             pageIndex,
@@ -39,35 +31,35 @@ public class SerieService : ISerieService
             TotalCount = result.TotalCount,
             PageIndex = result.PageIndex,
             CountPerPage = result.CountPerPage,
-            Items = _mapper.Map<IEnumerable<SerieDto>>(result.Items)
+            Items = mapper.Map<IEnumerable<SerieDto>>(result.Items)
         };
     }
 
     public async Task<SerieDetailsDto?> GetSerieByIdAsync(
-        Guid userId,
         Guid serieId,
         CancellationToken cancellationToken = default)
     {
-        var serie = await _unitOfWork.Series.GetByIdWithSeasonsAndEpisodesAsync(serieId, cancellationToken);
+        var userId = currentUserService.UserId;
+        var serie = await unitOfWork.Series.GetByIdWithSeasonsAndEpisodesAsync(serieId, cancellationToken);
         
         if (serie == null)
             return null;
         
-        return serie.UserId != userId ? throw new ForbiddenException() : _mapper.Map<SerieDetailsDto>(serie);
+        return serie.UserId != userId ? throw new ForbiddenException() : mapper.Map<SerieDetailsDto>(serie);
     }
     
     public async Task<PagingResult<SerieDto>> GetSeriesByStatusAsync(
-        Guid userId,
         string status,
         SerieOrderingCriteria orderingCriteria = SerieOrderingCriteria.None,
         int pageIndex = 0,
         int countPerPage = 10,
         CancellationToken cancellationToken = default)
     {
+        var userId = currentUserService.UserId;
         if (!Enum.TryParse<MediaStatus>(status, out var mediaStatus))
             throw new ValidationException($"Invalid status: {status}. Must be ToWatch, Watching, or Watched.");
         
-        var result = await _unitOfWork.Series.GetSeriesByStatusAsync(
+        var result = await unitOfWork.Series.GetSeriesByStatusAsync(
             userId,
             mediaStatus,
             orderingCriteria,
@@ -80,15 +72,15 @@ public class SerieService : ISerieService
             TotalCount = result.TotalCount,
             PageIndex = result.PageIndex,
             CountPerPage = result.CountPerPage,
-            Items = _mapper.Map<IEnumerable<SerieDto>>(result.Items)
+            Items = mapper.Map<IEnumerable<SerieDto>>(result.Items)
         };
     }
     
     public async Task<SerieDetailsDto> CreateSerieAsync(
-        Guid userId,
         CreateSerieDto createSerieDto,
         CancellationToken cancellationToken = default)
     {
+        var userId = currentUserService.UserId;
         var serie = Serie.Create(
             userId,
             createSerieDto.Title,
@@ -97,19 +89,19 @@ public class SerieService : ISerieService
             createSerieDto.PosterUrl
         );
         
-        await _unitOfWork.Series.AddAsync(serie, cancellationToken);
-        await _unitOfWork.SaveChangesAsync(cancellationToken);
+        await unitOfWork.Series.AddAsync(serie, cancellationToken);
+        await unitOfWork.SaveChangesAsync(cancellationToken);
         
-        return _mapper.Map<SerieDetailsDto>(serie);
+        return mapper.Map<SerieDetailsDto>(serie);
     }
     
     public async Task<SerieDetailsDto> UpdateSerieAsync(
-        Guid userId,
         Guid serieId,
         UpdateSerieDto updateSerieDto,
         CancellationToken cancellationToken = default)
     {
-        var serie = await _unitOfWork.Series.GetByIdAsync(serieId, cancellationToken);
+        var userId = currentUserService.UserId;
+        var serie = await unitOfWork.Series.GetByIdAsync(serieId, cancellationToken);
         
         if (serie == null)
             throw new NotFoundException("Serie", serieId);
@@ -117,7 +109,6 @@ public class SerieService : ISerieService
         if (serie.UserId != userId)
             throw new ForbiddenException();
         
-        // Mettre à jour les propriétés
         if (!string.IsNullOrWhiteSpace(updateSerieDto.Title))
             serie.UpdateTitle(updateSerieDto.Title);
         
@@ -130,24 +121,23 @@ public class SerieService : ISerieService
         if (updateSerieDto.PosterUrl != null)
             serie.UpdatePosterUrl(updateSerieDto.PosterUrl);
         
-        _unitOfWork.Series.Update(serie);
-        await _unitOfWork.SaveChangesAsync(cancellationToken);
+        unitOfWork.Series.Update(serie);
+        await unitOfWork.SaveChangesAsync(cancellationToken);
         
-        // Recharger avec les saisons/épisodes pour le DTO
-        var updatedSerie = await _unitOfWork.Series.GetByIdWithSeasonsAndEpisodesAsync(serieId, cancellationToken);
-        return _mapper.Map<SerieDetailsDto>(updatedSerie);
+        var updatedSerie = await unitOfWork.Series.GetByIdWithSeasonsAndEpisodesAsync(serieId, cancellationToken);
+        return mapper.Map<SerieDetailsDto>(updatedSerie);
     }
     
     public async Task UpdateSerieStatusAsync(
-        Guid userId,
         Guid serieId,
         string status,
         CancellationToken cancellationToken = default)
     {
+        var userId = currentUserService.UserId;
         if (!Enum.TryParse<MediaStatus>(status, out var mediaStatus))
             throw new ValidationException($"Invalid status: {status}");
         
-        var serie = await _unitOfWork.Series.GetByIdAsync(serieId, cancellationToken);
+        var serie = await unitOfWork.Series.GetByIdAsync(serieId, cancellationToken);
         
         if (serie == null)
             throw new NotFoundException("Serie", serieId);
@@ -157,17 +147,17 @@ public class SerieService : ISerieService
         
         serie.UpdateStatus(mediaStatus);
         
-        _unitOfWork.Series.Update(serie);
-        await _unitOfWork.SaveChangesAsync(cancellationToken);
+        unitOfWork.Series.Update(serie);
+        await unitOfWork.SaveChangesAsync(cancellationToken);
     }
     
     public async Task RateSerieAsync(
-        Guid userId,
         Guid serieId,
         double rating,
         CancellationToken cancellationToken = default)
     {
-        var serie = await _unitOfWork.Series.GetByIdAsync(serieId, cancellationToken);
+        var userId = currentUserService.UserId;
+        var serie = await unitOfWork.Series.GetByIdAsync(serieId, cancellationToken);
         
         if (serie == null)
             throw new NotFoundException("Serie", serieId);
@@ -177,16 +167,16 @@ public class SerieService : ISerieService
         
         serie.SetRating(rating);
         
-        _unitOfWork.Series.Update(serie);
-        await _unitOfWork.SaveChangesAsync(cancellationToken);
+        unitOfWork.Series.Update(serie);
+        await unitOfWork.SaveChangesAsync(cancellationToken);
     }
     
     public async Task DeleteSerieAsync(
-        Guid userId,
         Guid serieId,
         CancellationToken cancellationToken = default)
     {
-        var serie = await _unitOfWork.Series.GetByIdAsync(serieId, cancellationToken);
+        var userId = currentUserService.UserId;
+        var serie = await unitOfWork.Series.GetByIdAsync(serieId, cancellationToken);
         
         if (serie == null)
             throw new NotFoundException("Serie", serieId);
@@ -194,8 +184,7 @@ public class SerieService : ISerieService
         if (serie.UserId != userId)
             throw new ForbiddenException();
         
-        // EF Core cascade delete s'occupe des saisons et épisodes
-        _unitOfWork.Series.Delete(serie);
-        await _unitOfWork.SaveChangesAsync(cancellationToken);
+        unitOfWork.Series.Delete(serie);
+        await unitOfWork.SaveChangesAsync(cancellationToken);
     }
 }
