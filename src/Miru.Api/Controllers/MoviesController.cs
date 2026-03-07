@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Miru.Contracts.Common;
 using Miru.Contracts.DTOs.Movies;
 using Miru.Contracts.Services;
+using Miru.Domain;
 
 namespace Miru.Api.Controllers;
 
@@ -12,7 +13,7 @@ namespace Miru.Api.Controllers;
 /// <param name="service"></param>
 /// <param name="logger"></param>
 [ApiController]
-[Route("api/movies")]
+[Route("movies")]
 [Authorize]
 public class MoviesController(IMovieService service, ILogger<MoviesController> logger) : ControllerBase
 {
@@ -33,17 +34,11 @@ public class MoviesController(IMovieService service, ILogger<MoviesController> l
         [FromQuery] int countPerPage = 10,
         CancellationToken cancellationToken = default)
     {
-        logger.LogInformation("Fetching user's movies with criteria: {Criteria}, page: {Page}", 
-            orderingCriteria, pageIndex);
-        
         var result = await service.GetMoviesAsync(
             orderingCriteria,
             pageIndex,
             countPerPage,
             cancellationToken);
-        
-        logger.LogInformation("Successfully fetched {Count} movies out of {Total}", 
-            result.Items.Count(), result.TotalCount);
         
         return Ok(result);
     }
@@ -63,8 +58,6 @@ public class MoviesController(IMovieService service, ILogger<MoviesController> l
         Guid id, 
         CancellationToken cancellationToken = default)
     {
-        logger.LogInformation("Fetching movie with ID: {MovieId}", id);
-        
         var result = await service.GetMovieByIdAsync(id, cancellationToken);
         
         if (result == null)
@@ -73,7 +66,6 @@ public class MoviesController(IMovieService service, ILogger<MoviesController> l
             return NotFound();
         }
         
-        logger.LogInformation("Successfully fetched movie: {Title}", result.Title);
         return Ok(result);
     }
 
@@ -91,14 +83,12 @@ public class MoviesController(IMovieService service, ILogger<MoviesController> l
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public async Task<ActionResult<PagingResult<MovieDto>>> GetMoviesByStatusAsync(
-        string status,
+        MediaStatus status,
         [FromQuery] MovieOrderingCriteria orderingCriteria = MovieOrderingCriteria.None,
         [FromQuery] int pageIndex = 0,
         [FromQuery] int countPerPage = 10,
         CancellationToken cancellationToken = default)
     {
-        logger.LogInformation("Fetching movies with status: {Status}", status);
-        
         var result = await service.GetMoviesByStatusAsync(
             status,
             orderingCriteria,
@@ -106,9 +96,6 @@ public class MoviesController(IMovieService service, ILogger<MoviesController> l
             countPerPage,
             cancellationToken);
 
-        logger.LogInformation("Successfully fetched {Count} movies with status: {Status}", 
-            result.Items.Count(), status);
-        
         return Ok(result);
     }
 
@@ -131,17 +118,12 @@ public class MoviesController(IMovieService service, ILogger<MoviesController> l
         [FromQuery] int countPerPage = 10,
         CancellationToken cancellationToken = default)
     {
-        logger.LogInformation("Searching movies with title: {Title}", title);
-        
         var result = await service.SearchMoviesByTitleAsync(
             title,
             orderBy,
             pageIndex,
             countPerPage,
             cancellationToken);
-        
-        logger.LogInformation("Found {Count} movies matching '{Title}'", 
-            result.Items.Count(), title);
         
         return Ok(result);
     }
@@ -166,11 +148,7 @@ public class MoviesController(IMovieService service, ILogger<MoviesController> l
             return BadRequest(ModelState);
         }
         
-        logger.LogInformation("Creating new movie: {Title}", createMovieDto.Title);
-        
         var movie = await service.CreateMovieAsync(createMovieDto, cancellationToken);
-        
-        logger.LogInformation("Successfully created movie with ID: {MovieId}", movie.Id);
         
         return Created($"/api/movies/{movie.Id}", movie);
     }
@@ -195,15 +173,10 @@ public class MoviesController(IMovieService service, ILogger<MoviesController> l
     {
         if (!ModelState.IsValid)
         {
-            logger.LogWarning("Invalid model state for movie update: {MovieId}", id);
             return BadRequest(ModelState);
         }
         
-        logger.LogInformation("Updating movie with ID: {MovieId}", id);
-        
         var movie = await service.UpdateMovieAsync(id, updateMovieDto, cancellationToken);
-        
-        logger.LogInformation("Successfully updated movie: {MovieId}", id);
         
         return Ok(movie);
     }
@@ -228,15 +201,10 @@ public class MoviesController(IMovieService service, ILogger<MoviesController> l
     {
         if (!ModelState.IsValid)
         {
-            logger.LogWarning("Invalid model state for status update: {MovieId}", id);
             return BadRequest(ModelState);
         }
         
-        logger.LogInformation("Updating status for movie {MovieId} to {Status}", id, dto.Status);
-        
-        await service.UpdateMovieStatusAsync(id, dto.Status.ToString(), cancellationToken);
-        
-        logger.LogInformation("Successfully updated status for movie: {MovieId}", id);
+        await service.UpdateMovieStatusAsync(id, dto.Status, cancellationToken);
         
         return NoContent();
     }
@@ -261,15 +229,10 @@ public class MoviesController(IMovieService service, ILogger<MoviesController> l
     {
         if (!ModelState.IsValid)
         {
-            logger.LogWarning("Invalid model state for rating update: {MovieId}", id);
             return BadRequest(ModelState);
         }
         
-        logger.LogInformation("Rating movie {MovieId} with {Rating}", id, dto.Rating);
-        
         await service.RateMovieAsync(id, dto.Rating, cancellationToken);
-        
-        logger.LogInformation("Successfully rated movie: {MovieId}", id);
         
         return NoContent();
     }
@@ -289,11 +252,7 @@ public class MoviesController(IMovieService service, ILogger<MoviesController> l
         Guid id,
         CancellationToken cancellationToken = default)
     {
-        logger.LogInformation("Deleting movie with ID: {MovieId}", id);
-        
         await service.DeleteMovieAsync(id, cancellationToken);
-        
-        logger.LogInformation("Successfully deleted movie: {MovieId}", id);
         
         return NoContent();
     }

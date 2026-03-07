@@ -49,19 +49,17 @@ public class SerieService(IUnitOfWork unitOfWork, IMapper mapper, ICurrentUserSe
     }
     
     public async Task<PagingResult<SerieDto>> GetSeriesByStatusAsync(
-        string status,
+        MediaStatus status,
         SerieOrderingCriteria orderingCriteria = SerieOrderingCriteria.None,
         int pageIndex = 0,
         int countPerPage = 10,
         CancellationToken cancellationToken = default)
     {
         var userId = currentUserService.UserId;
-        if (!Enum.TryParse<MediaStatus>(status, out var mediaStatus))
-            throw new ValidationException($"Invalid status: {status}. Must be ToWatch, Watching, or Watched.");
         
         var result = await unitOfWork.Series.GetSeriesByStatusAsync(
             userId,
-            mediaStatus,
+            status,
             orderingCriteria,
             pageIndex,
             countPerPage,
