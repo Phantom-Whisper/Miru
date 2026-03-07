@@ -1,3 +1,4 @@
+using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Miru.Application.Mappings;
@@ -36,7 +37,9 @@ builder.Services
 builder.Services.AddAutoMapper(_ => { }, typeof(MappingProfile));
 
 // Add services to the container.
-builder.Services.AddControllers();
+builder.Services.AddControllers()
+    .AddJsonOptions(opt => { opt.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()); });
+
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 
 builder.Services.AddOpenApiDocument(options =>
@@ -92,6 +95,8 @@ builder.Services.AddAuthorization(options =>
 
 
 var app = builder.Build();
+
+// app.UseMiddleware<RequestLoggingMiddleware>(); // TODO: Need to create a class
 
 using (var scope = app.Services.CreateScope())
 {
