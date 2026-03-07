@@ -1,6 +1,7 @@
 using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Miru.Api.Middleware;
 using Miru.Application.Mappings;
 using Miru.Application.Services;
 using Miru.Contracts.Persistence;
@@ -96,7 +97,7 @@ builder.Services.AddAuthorization(options =>
 
 var app = builder.Build();
 
-// app.UseMiddleware<RequestLoggingMiddleware>(); // TODO: Need to create a class
+app.UseMiddleware<LoggingMiddleware>();
 
 using (var scope = app.Services.CreateScope())
 {
