@@ -1,5 +1,6 @@
 ﻿using Miru.Contracts.Common;
 using Miru.Contracts.DTOs.Movies;
+using Miru.Domain;
 
 namespace Miru.Contracts.Services;
 
@@ -16,7 +17,7 @@ public interface IMovieService
         CancellationToken cancellationToken = default);
 
     Task<PagingResult<MovieDto>> GetMoviesByStatusAsync(
-        string status,
+        MediaStatus status,
         MovieOrderingCriteria orderingCriteria = MovieOrderingCriteria.None,
         int pageIndex = 0,
         int countPerPage = 10,
@@ -40,7 +41,7 @@ public interface IMovieService
 
     Task UpdateMovieStatusAsync(
         Guid movieId,
-        string status,
+        MediaStatus status,
         CancellationToken cancellationToken = default);
 
     Task RateMovieAsync(

@@ -1,5 +1,6 @@
 ﻿using Miru.Contracts.Common;
 using Miru.Contracts.DTOs.Series;
+using Miru.Domain;
 
 namespace Miru.Contracts.Services;
 
@@ -16,7 +17,7 @@ public interface ISerieService
         CancellationToken cancellationToken = default);
     
     Task<PagingResult<SerieDto>> GetSeriesByStatusAsync(
-        string status,
+        MediaStatus status,
         SerieOrderingCriteria orderingCriteria = SerieOrderingCriteria.None,
         int pageIndex = 0,
         int countPerPage = 10,

@@ -44,18 +44,15 @@ public class MovieService(IUnitOfWork unitOfWork, IMapper mapper, ICurrentUserSe
         return movie.UserId != userId ? throw new ForbiddenException() : mapper.Map<MovieDetailsDto>(movie);
     }
 
-    public async Task<PagingResult<MovieDto>> GetMoviesByStatusAsync(string status,
+    public async Task<PagingResult<MovieDto>> GetMoviesByStatusAsync(MediaStatus status,
         MovieOrderingCriteria orderingCriteria = MovieOrderingCriteria.None, int pageIndex = 0, int countPerPage = 10,
         CancellationToken cancellationToken = default)
     {
         var userId = currentUserService.UserId;
         
-        if (!Enum.TryParse<MediaStatus>(status, out var mediaStatus))
-            throw new ValidationException($"Invalid status: {status}. Must be ToWatch, Watching, or Watched.");
-        
         var result = await unitOfWork.Movies.GetMoviesByStatusAsync(
             userId,
-            mediaStatus,
+            status,
             orderingCriteria,
             pageIndex,
             countPerPage,
@@ -145,12 +142,10 @@ public class MovieService(IUnitOfWork unitOfWork, IMapper mapper, ICurrentUserSe
         return mapper.Map<MovieDetailsDto>(movie);
     }
 
-    public async Task UpdateMovieStatusAsync(Guid movieId, string status, CancellationToken cancellationToken = default)
+    public async Task UpdateMovieStatusAsync(Guid movieId, MediaStatus status, CancellationToken cancellationToken = default)
     {
         var userId = currentUserService.UserId;
 
-        if (!Enum.TryParse<MediaStatus>(status, out var mediaStatus))
-            throw new ValidationException($"Invalid status: {status}");
         
         var movie = await unitOfWork.Movies.GetByIdAsync(movieId, cancellationToken);
         
@@ -160,7 +155,7 @@ public class MovieService(IUnitOfWork unitOfWork, IMapper mapper, ICurrentUserSe
         if (movie.UserId != userId)
             throw new ForbiddenException();
         
-        movie.UpdateStatus(mediaStatus);
+        movie.UpdateStatus(status);
         
         unitOfWork.Movies.Update(movie);
         await unitOfWork.SaveChangesAsync(cancellationToken);

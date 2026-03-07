@@ -5,11 +5,12 @@ using Miru.Contracts.DTOs.Episodes;
 using Miru.Contracts.DTOs.Seasons;
 using Miru.Contracts.DTOs.Series;
 using Miru.Contracts.Services;
+using Miru.Domain;
 
 namespace Miru.Api.Controllers;
 
 [ApiController]
-[Route("api/series")]
+[Route("series")]
 [Authorize]
 public class SeriesController(
     ISerieService serieService,
@@ -75,7 +76,7 @@ public class SeriesController(
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public async Task<ActionResult<PagingResult<SerieDto>>> GetSeriesByStatusAsync(
-        string status,
+        MediaStatus status,
         [FromQuery] SerieOrderingCriteria orderBy = SerieOrderingCriteria.None,
         [FromQuery] int pageIndex = 0,
         [FromQuery] int countPerPage = 10,
