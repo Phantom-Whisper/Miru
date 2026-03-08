@@ -1,10 +1,10 @@
 ﻿using AutoMapper;
 using Miru.Application.Exceptions;
-using Miru.Contracts.DTOs.Seasons;
-using Miru.Contracts.Persistence;
-using Miru.Contracts.Services;
+using Miru.Shared.DTOs.Seasons;
+using Miru.Shared.Services;
 using Miru.Domain.Entities;
 using Miru.Domain.Exceptions;
+using Miru.Infrastructure.Persistence.UnitOfWork;
 
 namespace Miru.Application.Services;
 

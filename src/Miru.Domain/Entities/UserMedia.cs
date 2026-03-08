@@ -1,4 +1,6 @@
-﻿namespace Miru.Domain.Entities;
+﻿using Miru.Shared.Common.Enums;
+
+namespace Miru.Domain.Entities;
 
 // May be used in later version
 public class UserMedia

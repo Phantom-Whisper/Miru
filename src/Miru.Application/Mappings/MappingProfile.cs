@@ -1,8 +1,8 @@
 ﻿using AutoMapper;
-using Miru.Contracts.DTOs.Episodes;
-using Miru.Contracts.DTOs.Movies;
-using Miru.Contracts.DTOs.Seasons;
-using Miru.Contracts.DTOs.Series;
+using Miru.Shared.DTOs.Episodes;
+using Miru.Shared.DTOs.Movies;
+using Miru.Shared.DTOs.Seasons;
+using Miru.Shared.DTOs.Series;
 using Miru.Domain.Entities;
 
 namespace Miru.Application.Mappings;

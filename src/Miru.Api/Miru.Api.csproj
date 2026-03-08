@@ -22,7 +22,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Miru.Application\Miru.Application.csproj" />
-    <ProjectReference Include="..\Miru.Contracts\Miru.Contracts.csproj" />
+    <ProjectReference Include="..\Miru.Shared\Miru.Shared.csproj" />
     <ProjectReference Include="..\Miru.Infrastructure\Miru.Infrastructure.csproj" />
   </ItemGroup>
 

@@ -2,6 +2,7 @@
 using Miru.Domain.Entities;
 using Miru.Infrastructure.Persistence;
 using Miru.Infrastructure;
+using Miru.Infrastructure.Persistence.UnitOfWork;
 
 namespace Miru.Test.Infrastructure;
 
