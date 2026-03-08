@@ -1,12 +1,12 @@
 ﻿using AutoMapper;
 using Microsoft.Extensions.Logging;
 using Miru.Application.Mappings;
-using Miru.Contracts.DTOs.Episodes;
-using Miru.Contracts.DTOs.Movies;
-using Miru.Contracts.DTOs.Seasons;
-using Miru.Contracts.DTOs.Series;
-using Miru.Domain;
 using Miru.Domain.Entities;
+using Miru.Shared.Common.Enums;
+using Miru.Shared.DTOs.Episodes;
+using Miru.Shared.DTOs.Movies;
+using Miru.Shared.DTOs.Seasons;
+using Miru.Shared.DTOs.Series;
 
 namespace Miru.Test.Application;
 

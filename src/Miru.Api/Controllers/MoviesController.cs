@@ -1,9 +1,10 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Miru.Contracts.Common;
-using Miru.Contracts.DTOs.Movies;
-using Miru.Contracts.Services;
+using Miru.Shared.Common;
+using Miru.Shared.DTOs.Movies;
+using Miru.Shared.Services;
 using Miru.Domain;
+using Miru.Shared.Common.Enums;
 
 namespace Miru.Api.Controllers;
 

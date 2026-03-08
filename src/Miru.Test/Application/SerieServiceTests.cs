@@ -1,13 +1,13 @@
 ﻿using AutoMapper;
 using Miru.Application.Exceptions;
 using Miru.Application.Services;
-using Miru.Contracts.Common;
-using Miru.Contracts.DTOs.Series;
-using Miru.Contracts.Persistence;
-using Miru.Contracts.Repositories;
-using Miru.Contracts.Services;
-using Miru.Domain;
 using Miru.Domain.Entities;
+using Miru.Domain.Repositories;
+using Miru.Infrastructure.Persistence.UnitOfWork;
+using Miru.Shared.Common;
+using Miru.Shared.Common.Enums;
+using Miru.Shared.DTOs.Series;
+using Miru.Shared.Services;
 using Moq;
 
 namespace Miru.Test.Application;
