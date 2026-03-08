@@ -15,7 +15,8 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\Miru.Contracts\Miru.Contracts.csproj" />
+      <ProjectReference Include="..\Miru.Infrastructure\Miru.Infrastructure.csproj" />
+      <ProjectReference Include="..\Miru.Shared\Miru.Shared.csproj" />
       <ProjectReference Include="..\Miru.Domain\Miru.Domain.csproj" />
     </ItemGroup>
 

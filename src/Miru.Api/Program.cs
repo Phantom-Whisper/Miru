@@ -4,11 +4,10 @@ using Microsoft.EntityFrameworkCore;
 using Miru.Api.Middleware;
 using Miru.Application.Mappings;
 using Miru.Application.Services;
-using Miru.Contracts.Persistence;
-using Miru.Contracts.Services;
+using Miru.Shared.Services;
 using Miru.Domain.Entities;
 using Miru.Infrastructure;
-using Miru.Infrastructure.Persistence;
+using Miru.Infrastructure.Persistence.UnitOfWork;
 using NSwag;
 using NSwag.Generation.Processors.Security;
 

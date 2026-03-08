@@ -1,10 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Miru.Contracts.Common;
-using Miru.Contracts.Persistence;
-using Miru.Domain;
 using Miru.Domain.Entities;
 using Miru.Infrastructure;
-using Miru.Infrastructure.Persistence;
+using Miru.Infrastructure.Persistence.UnitOfWork;
+using Miru.Shared.Common;
+using Miru.Shared.Common.Enums;
 
 namespace Miru.Test.Infrastructure;
 

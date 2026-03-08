@@ -2,6 +2,7 @@
 using Miru.Domain;
 using Miru.Domain.Entities;
 using Miru.Infrastructure;
+using Miru.Shared.Common.Enums;
 
 namespace Miru.Test.Infrastructure;
 
@@ -37,7 +38,7 @@ public class IntegrationTests : IDisposable
         
         // User creates a serie in their library
         var serie = Serie.Create(
-            user.Id, // ← User owns this serie
+            user.Id,
             "Game of Thrones",
             new DateOnly(2011, 4, 17),
             "Nine noble families fight for control over the lands of Westeros"
