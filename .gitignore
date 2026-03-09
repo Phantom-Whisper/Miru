@@ -421,3 +421,9 @@ FodyWeavers.xsd
 .idea/
 *.sln.iml
 *.deployproj
+
+wwwroot/_framework/
+wwwroot/service-worker-assets.js
+.dotnet/
+.DS_Store
+Thumbs.db
