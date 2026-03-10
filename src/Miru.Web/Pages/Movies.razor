@@ -1,0 +1,19 @@
+﻿@page "/Movies"
+
+<PageTitle>Movies</PageTitle>
+
+<h3>Movies</h3>
+
+@if (Items is not null)
+{
+    foreach (var movie in Items)
+    {
+        <div>ID: @movie.Id</div>
+        <div>Title: @movie.Title</div>
+        <div>Status: @movie.Status</div>
+        <div>Duration: @movie.Duration</div>
+        <div>Rating: @movie.Rating</div>
+        <div>Poster url: @movie.PosterUrl</div>
+        <br/>
+    }
+}
