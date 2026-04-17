@@ -1,3 +1,4 @@
+using System.Reflection;
 using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -40,13 +41,22 @@ builder.Services.AddControllers()
 
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 
+var version = Assembly.GetExecutingAssembly()
+    .GetName()
+    .Version;
+
+var cleanVersion = version is null
+    ? "unknown"
+    : $"{version.Major}.{version.Minor}.{version.Build}";
+
 builder.Services.AddOpenApiDocument(options =>
 {
     options.PostProcess = document =>
     {
         document.Info = new OpenApiInfo
         {
-            Version = "v1",
+            
+            Version = cleanVersion,
             Title = "Miru API",
             Description = "Miru API",
             TermsOfService = "None",

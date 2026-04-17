@@ -1,0 +1,21 @@
+﻿name: build
+
+on:
+  push:
+    tags:
+      - "v*.*.*"
+
+jobs:
+  build-api:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Extract version
+        run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_ENV
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0
+      - name: Build API
+        run: |
+          dotnet publish ./Miru.Api/Miru.Api.csproj -c Release -o out /p:Version=${{ env.VERSION }}
