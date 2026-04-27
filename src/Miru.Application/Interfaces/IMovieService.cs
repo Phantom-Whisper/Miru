@@ -1,9 +1,8 @@
-﻿using Miru.Domain;
-using Miru.Shared.Common;
+﻿using Miru.Shared.Common;
 using Miru.Shared.Common.Enums;
 using Miru.Shared.DTOs.Movies;
 
-namespace Miru.Shared.Services;
+namespace Miru.Application.Interfaces;
 
 public interface IMovieService
 {
@@ -13,8 +12,7 @@ public interface IMovieService
         int countPerPage = 10,
         CancellationToken cancellationToken = default);
     
-    Task<MovieDto?> GetMovieByIdAsync(
-        Guid movieId,
+    Task<MovieDetailsDto?> GetMovieByIdAsync(Guid movieId,
         CancellationToken cancellationToken = default);
 
     Task<PagingResult<MovieDto>> GetMoviesByStatusAsync(

@@ -1,6 +1,6 @@
 ﻿using Miru.Shared.DTOs.Seasons;
 
-namespace Miru.Shared.Services;
+namespace Miru.Application.Interfaces;
 
 public interface ISeasonService
 {

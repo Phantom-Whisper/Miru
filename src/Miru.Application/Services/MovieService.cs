@@ -1,15 +1,15 @@
-﻿using AutoMapper;
-using Miru.Application.Exceptions;
+﻿using Miru.Application.Exceptions;
+using Miru.Application.Interfaces;
+using Miru.Application.Mappings;
 using Miru.Shared.Common;
 using Miru.Shared.DTOs.Movies;
-using Miru.Shared.Services;
 using Miru.Domain.Entities;
 using Miru.Infrastructure.Persistence.UnitOfWork;
 using Miru.Shared.Common.Enums;
 
 namespace Miru.Application.Services;
 
-public class MovieService(IUnitOfWork unitOfWork, IMapper mapper, ICurrentUserService currentUserService)
+public class MovieService(IUnitOfWork unitOfWork, ICurrentUserService currentUserService)
     : IMovieService
 {
     public async Task<PagingResult<MovieDto>> GetMoviesAsync(MovieOrderingCriteria orderingCriteria = MovieOrderingCriteria.None, int pageIndex = 0,
@@ -29,11 +29,11 @@ public class MovieService(IUnitOfWork unitOfWork, IMapper mapper, ICurrentUserSe
             TotalCount = result.TotalCount,
             PageIndex = result.PageIndex,
             CountPerPage = result.CountPerPage,
-            Items = mapper.Map<IEnumerable<MovieDto>>(result.Items)
+            Items = result.Items.Select(m => m.ToDto())
         };
     }
 
-    public async Task<MovieDto?> GetMovieByIdAsync(Guid movieId, CancellationToken cancellationToken = default)
+    public async Task<MovieDetailsDto?> GetMovieByIdAsync(Guid movieId, CancellationToken cancellationToken = default)
     {
         var userId = currentUserService.UserId;
         
@@ -41,7 +41,7 @@ public class MovieService(IUnitOfWork unitOfWork, IMapper mapper, ICurrentUserSe
         
         if (movie == null) return null;
         
-        return movie.UserId != userId ? throw new ForbiddenException() : mapper.Map<MovieDetailsDto>(movie);
+        return movie.UserId != userId ? throw new ForbiddenException() : movie.ToDetailsDto();
     }
 
     public async Task<PagingResult<MovieDto>> GetMoviesByStatusAsync(MediaStatus status,
@@ -63,7 +63,7 @@ public class MovieService(IUnitOfWork unitOfWork, IMapper mapper, ICurrentUserSe
             TotalCount = result.TotalCount,
             PageIndex = result.PageIndex,
             CountPerPage = result.CountPerPage,
-            Items = mapper.Map<IEnumerable<MovieDto>>(result.Items)
+            Items = result.Items.Select(m => m.ToDetailsDto())
         };
     }
 
@@ -86,7 +86,7 @@ public class MovieService(IUnitOfWork unitOfWork, IMapper mapper, ICurrentUserSe
             TotalCount = result.TotalCount,
             PageIndex = result.PageIndex,
             CountPerPage = result.CountPerPage,
-            Items = mapper.Map<IEnumerable<MovieDto>>(result.Items)
+            Items = result.Items.Select(m => m.ToDto())
         };
     }
 
@@ -105,7 +105,7 @@ public class MovieService(IUnitOfWork unitOfWork, IMapper mapper, ICurrentUserSe
         await unitOfWork.Movies.AddAsync(movie, cancellationToken);
         await unitOfWork.SaveChangesAsync(cancellationToken);
         
-        return mapper.Map<MovieDetailsDto>(movie);
+        return movie.ToDetailsDto();
     }
 
     public async Task<MovieDetailsDto> UpdateMovieAsync(Guid movieId, UpdateMovieDto updateMovieDto,
@@ -139,7 +139,7 @@ public class MovieService(IUnitOfWork unitOfWork, IMapper mapper, ICurrentUserSe
         unitOfWork.Movies.Update(movie);
         await unitOfWork.SaveChangesAsync(cancellationToken);
         
-        return mapper.Map<MovieDetailsDto>(movie);
+        return movie.ToDetailsDto();
     }
 
     public async Task UpdateMovieStatusAsync(Guid movieId, MediaStatus status, CancellationToken cancellationToken = default)

@@ -1,7 +1,7 @@
 ﻿using Miru.Shared.Common;
 using Miru.Shared.DTOs.Episodes;
 
-namespace Miru.Shared.Services;
+namespace Miru.Application.Interfaces;
 
 public interface IEpisodeService
 {

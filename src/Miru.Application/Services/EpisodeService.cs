@@ -1,15 +1,15 @@
-﻿using AutoMapper;
-using Miru.Application.Exceptions;
+﻿using Miru.Application.Exceptions;
+using Miru.Application.Interfaces;
+using Miru.Application.Mappings;
 using Miru.Shared.Common;
 using Miru.Shared.DTOs.Episodes;
-using Miru.Shared.Services;
 using Miru.Domain.Entities;
 using Miru.Domain.Exceptions;
 using Miru.Infrastructure.Persistence.UnitOfWork;
 
 namespace Miru.Application.Services;
 
-public class EpisodeService(IUnitOfWork unitOfWork, IMapper mapper, ICurrentUserService currentUserService)
+public class EpisodeService(IUnitOfWork unitOfWork, ICurrentUserService currentUserService)
     : IEpisodeService
 {
     public async Task<PagingResult<EpisodeDto>> GetEpisodesBySeasonIdAsync(
@@ -36,7 +36,7 @@ public class EpisodeService(IUnitOfWork unitOfWork, IMapper mapper, ICurrentUser
             TotalCount = result.TotalCount,
             PageIndex = result.PageIndex,
             CountPerPage = result.CountPerPage,
-            Items = mapper.Map<IEnumerable<EpisodeDto>>(result.Items)
+            Items = result.Items.Select(e => e.ToDto())
         };
     }
     
@@ -55,7 +55,7 @@ public class EpisodeService(IUnitOfWork unitOfWork, IMapper mapper, ICurrentUser
         if (episode == null || episode.SeasonId != seasonId)
             return null;
         
-        return mapper.Map<EpisodeDto>(episode);
+        return episode.ToDto();
     }
     
     public async Task<EpisodeDto?> GetNextUnwatchedEpisodeAsync(
@@ -66,11 +66,8 @@ public class EpisodeService(IUnitOfWork unitOfWork, IMapper mapper, ICurrentUser
         await ValidateUserOwnsSerieAsync(userId, serieId, cancellationToken);
         
         var episode = await unitOfWork.Episodes.GetNextUnwatchedEpisodeAsync(userId, serieId, cancellationToken);
-        
-        if (episode == null)
-            return null;
-        
-        return mapper.Map<EpisodeDto>(episode);
+
+        return episode?.ToDto();
     }
     
     public async Task<PagingResult<EpisodeDto>> GetRecentlyWatchedEpisodesAsync(
@@ -90,7 +87,7 @@ public class EpisodeService(IUnitOfWork unitOfWork, IMapper mapper, ICurrentUser
             TotalCount = result.TotalCount,
             PageIndex = result.PageIndex,
             CountPerPage = result.CountPerPage,
-            Items = mapper.Map<IEnumerable<EpisodeDto>>(result.Items)
+            Items = result.Items.Select(e => e.ToDto())
         };
     }
     
@@ -127,7 +124,7 @@ public class EpisodeService(IUnitOfWork unitOfWork, IMapper mapper, ICurrentUser
         unitOfWork.Seasons.Update(season);
         await unitOfWork.SaveChangesAsync(cancellationToken);
         
-        return mapper.Map<EpisodeDto>(episode);
+        return episode.ToDto();
     }
 
     public async Task<EpisodeDto> UpdateEpisodeAsync(
@@ -158,7 +155,7 @@ public class EpisodeService(IUnitOfWork unitOfWork, IMapper mapper, ICurrentUser
         unitOfWork.Episodes.Update(episode);
         await unitOfWork.SaveChangesAsync(cancellationToken);
         
-        return mapper.Map<EpisodeDto>(episode);
+        return episode.ToDto();
     }
     
     public async Task MarkEpisodeAsWatchedAsync(

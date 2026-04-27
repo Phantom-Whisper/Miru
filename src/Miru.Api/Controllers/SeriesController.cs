@@ -1,10 +1,10 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Miru.Application.Interfaces;
 using Miru.Shared.Common;
 using Miru.Shared.DTOs.Episodes;
 using Miru.Shared.DTOs.Seasons;
 using Miru.Shared.DTOs.Series;
-using Miru.Shared.Services;
 using Miru.Domain;
 using Miru.Shared.Common.Enums;
 

@@ -1,15 +1,15 @@
-﻿using AutoMapper;
-using Miru.Application.Exceptions;
+﻿using Miru.Application.Exceptions;
+using Miru.Application.Interfaces;
+using Miru.Application.Mappings;
 using Miru.Shared.Common;
 using Miru.Shared.DTOs.Series;
-using Miru.Shared.Services;
 using Miru.Domain.Entities;
 using Miru.Infrastructure.Persistence.UnitOfWork;
 using Miru.Shared.Common.Enums;
 
 namespace Miru.Application.Services;
 
-public class SerieService(IUnitOfWork unitOfWork, IMapper mapper, ICurrentUserService currentUserService)
+public class SerieService(IUnitOfWork unitOfWork, ICurrentUserService currentUserService)
     : ISerieService
 {
     public async Task<PagingResult<SerieDto>> GetSeriesAsync(
@@ -31,7 +31,7 @@ public class SerieService(IUnitOfWork unitOfWork, IMapper mapper, ICurrentUserSe
             TotalCount = result.TotalCount,
             PageIndex = result.PageIndex,
             CountPerPage = result.CountPerPage,
-            Items = mapper.Map<IEnumerable<SerieDto>>(result.Items)
+            Items = result.Items.Select(s => s.ToDto())
         };
     }
 
@@ -45,7 +45,7 @@ public class SerieService(IUnitOfWork unitOfWork, IMapper mapper, ICurrentUserSe
         if (serie == null)
             return null;
         
-        return serie.UserId != userId ? throw new ForbiddenException() : mapper.Map<SerieDetailsDto>(serie);
+        return serie.UserId != userId ? throw new ForbiddenException() : serie.ToDetailsDto();
     }
     
     public async Task<PagingResult<SerieDto>> GetSeriesByStatusAsync(
@@ -70,7 +70,7 @@ public class SerieService(IUnitOfWork unitOfWork, IMapper mapper, ICurrentUserSe
             TotalCount = result.TotalCount,
             PageIndex = result.PageIndex,
             CountPerPage = result.CountPerPage,
-            Items = mapper.Map<IEnumerable<SerieDto>>(result.Items)
+            Items = result.Items.Select(s => s.ToDto())
         };
     }
     
@@ -89,8 +89,8 @@ public class SerieService(IUnitOfWork unitOfWork, IMapper mapper, ICurrentUserSe
         
         await unitOfWork.Series.AddAsync(serie, cancellationToken);
         await unitOfWork.SaveChangesAsync(cancellationToken);
-        
-        return mapper.Map<SerieDetailsDto>(serie);
+
+        return serie.ToDetailsDto();
     }
     
     public async Task<SerieDetailsDto> UpdateSerieAsync(
@@ -123,7 +123,8 @@ public class SerieService(IUnitOfWork unitOfWork, IMapper mapper, ICurrentUserSe
         await unitOfWork.SaveChangesAsync(cancellationToken);
         
         var updatedSerie = await unitOfWork.Series.GetByIdWithSeasonsAndEpisodesAsync(serieId, cancellationToken);
-        return mapper.Map<SerieDetailsDto>(updatedSerie);
+        
+        return updatedSerie.ToDetailsDto();
     }
     
     public async Task UpdateSerieStatusAsync(
