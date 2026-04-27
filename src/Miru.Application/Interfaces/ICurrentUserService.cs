@@ -1,4 +1,4 @@
-﻿namespace Miru.Shared.Services;
+﻿namespace Miru.Application.Interfaces;
 
 public interface ICurrentUserService
 {

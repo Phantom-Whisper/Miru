@@ -1,5 +1,5 @@
-﻿using AutoMapper;
-using Miru.Application.Exceptions;
+﻿using Miru.Application.Exceptions;
+using Miru.Application.Interfaces;
 using Miru.Application.Services;
 using Miru.Domain.Entities;
 using Miru.Domain.Repositories;
@@ -7,7 +7,6 @@ using Miru.Infrastructure.Persistence.UnitOfWork;
 using Miru.Shared.Common;
 using Miru.Shared.Common.Enums;
 using Miru.Shared.DTOs.Series;
-using Miru.Shared.Services;
 using Moq;
 
 namespace Miru.Test.Application;
@@ -16,7 +15,6 @@ public class SerieServiceTests
 {
     private readonly Mock<IUnitOfWork> _mockUnitOfWork;
     private readonly Mock<ISerieRepository> _mockSerieRepository;
-    private readonly Mock<IMapper> _mockMapper;
     private readonly SerieService _serieService;
     private readonly Guid _userId;
 
@@ -24,8 +22,6 @@ public class SerieServiceTests
     {
         _mockUnitOfWork = new Mock<IUnitOfWork>();
         _mockSerieRepository = new Mock<ISerieRepository>();
-        _mockMapper = new Mock<IMapper>();
-        
         var mockCurrentUser = new Mock<ICurrentUserService>();
         _userId = Guid.NewGuid();
 
@@ -35,7 +31,7 @@ public class SerieServiceTests
 
         _mockUnitOfWork.Setup(u => u.Series).Returns(_mockSerieRepository.Object);
 
-        _serieService = new SerieService(_mockUnitOfWork.Object, _mockMapper.Object, mockCurrentUser.Object);
+        _serieService = new SerieService(_mockUnitOfWork.Object, mockCurrentUser.Object);
     }
 
     [Fact]
@@ -43,48 +39,37 @@ public class SerieServiceTests
     {
         var series = new List<Serie>
         {
-            Serie.Create(_userId, "Serie 1", new DateOnly(2024,1,1)),
-            Serie.Create(_userId, "Serie 2", new DateOnly(2024,1,2))
+            Serie.Create(_userId, "Serie 1", new DateOnly(2024, 1, 1)),
+            Serie.Create(_userId, "Serie 2", new DateOnly(2024, 1, 2))
         };
-
-        var pagingResult = new PagingResult<Serie>
-        {
-            TotalCount = 2,
-            PageIndex = 0,
-            CountPerPage = 10,
-            Items = series
-        };
-
-        var serieDtos = series.Select(s => new SerieDto { Id = s.Id, Title = s.Title }).ToList();
 
         _mockSerieRepository
             .Setup(r => r.GetSeriesAsync(_userId, SerieOrderingCriteria.None, 0, 10, It.IsAny<CancellationToken>()))
-            .ReturnsAsync(pagingResult);
-
-        _mockMapper
-            .Setup(m => m.Map<IEnumerable<SerieDto>>(series))
-            .Returns(serieDtos);
+            .ReturnsAsync(new PagingResult<Serie>
+            {
+                TotalCount = 2, PageIndex = 0, CountPerPage = 10, Items = series
+            });
 
         var result = await _serieService.GetSeriesAsync();
 
         Assert.Equal(2, result.TotalCount);
         Assert.Equal(2, result.Items.Count());
-        _mockSerieRepository.Verify(r => r.GetSeriesAsync(_userId, SerieOrderingCriteria.None, 0, 10, It.IsAny<CancellationToken>()), Times.Once);
+        Assert.Equal("Serie 1", result.Items.First().Title);
+        Assert.Equal("Serie 2", result.Items.Last().Title);
+        _mockSerieRepository.Verify(r => r.GetSeriesAsync(
+            _userId, SerieOrderingCriteria.None, 0, 10, It.IsAny<CancellationToken>()), Times.Once);
     }
 
     [Fact]
     public async Task GetSerieByIdAsync_ReturnsSerieDetails_WhenUserMatches()
     {
-        var serieId = Guid.NewGuid();
-        var serie = Serie.Create(_userId, "My Serie", new DateOnly(2024,1,1));
+        var serie = Serie.Create(_userId, "My Serie", new DateOnly(2024, 1, 1));
 
-        _mockSerieRepository.Setup(r => r.GetByIdWithSeasonsAndEpisodesAsync(serieId, It.IsAny<CancellationToken>()))
+        _mockSerieRepository
+            .Setup(r => r.GetByIdWithSeasonsAndEpisodesAsync(serie.Id, It.IsAny<CancellationToken>()))
             .ReturnsAsync(serie);
 
-        var detailsDto = new SerieDetailsDto { Id = serieId, Title = "My Serie" };
-        _mockMapper.Setup(m => m.Map<SerieDetailsDto>(serie)).Returns(detailsDto);
-
-        var result = await _serieService.GetSerieByIdAsync(serieId);
+        var result = await _serieService.GetSerieByIdAsync(serie.Id);
 
         Assert.NotNull(result);
         Assert.Equal("My Serie", result.Title);
@@ -93,35 +78,48 @@ public class SerieServiceTests
     [Fact]
     public async Task GetSerieByIdAsync_WrongUser_ThrowsForbidden()
     {
-        var serie = Serie.Create(Guid.NewGuid(), "My Serie", new DateOnly(2024,1,1));
+        var serie = Serie.Create(Guid.NewGuid(), "My Serie", new DateOnly(2024, 1, 1));
 
-        _mockSerieRepository.Setup(r => r.GetByIdWithSeasonsAndEpisodesAsync(serie.Id, It.IsAny<CancellationToken>()))
+        _mockSerieRepository
+            .Setup(r => r.GetByIdWithSeasonsAndEpisodesAsync(serie.Id, It.IsAny<CancellationToken>()))
             .ReturnsAsync(serie);
 
-        await Assert.ThrowsAsync<ForbiddenException>(() => _serieService.GetSerieByIdAsync(serie.Id));
+        await Assert.ThrowsAsync<ForbiddenException>(
+            () => _serieService.GetSerieByIdAsync(serie.Id));
+    }
+
+    [Fact]
+    public async Task GetSerieByIdAsync_NotFound_ReturnsNull()
+    {
+        _mockSerieRepository
+            .Setup(r => r.GetByIdWithSeasonsAndEpisodesAsync(It.IsAny<Guid>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync((Serie?)null);
+
+        var result = await _serieService.GetSerieByIdAsync(Guid.NewGuid());
+
+        Assert.Null(result);
     }
 
     [Fact]
     public async Task CreateSerieAsync_ValidData_ReturnsDtoAndSaves()
     {
-        Guid.NewGuid();
         var createDto = new CreateSerieDto
         {
             Title = "New Serie",
-            ReleaseDate = new DateOnly(2024,1,1),
+            ReleaseDate = new DateOnly(2024, 1, 1),
             Description = "Desc",
-            PosterUrl = "url"
+            PosterUrl = "https://poster.jpg"
         };
 
-        _mockUnitOfWork.Setup(u => u.SaveChangesAsync(It.IsAny<CancellationToken>())).ReturnsAsync(1);
-
-        var mappedDto = new SerieDetailsDto { Title = "New Serie" };
-        _mockMapper.Setup(m => m.Map<SerieDetailsDto>(It.IsAny<Serie>())).Returns(mappedDto);
+        _mockUnitOfWork
+            .Setup(u => u.SaveChangesAsync(It.IsAny<CancellationToken>()))
+            .ReturnsAsync(1);
 
         var result = await _serieService.CreateSerieAsync(createDto);
 
         Assert.NotNull(result);
         Assert.Equal("New Serie", result.Title);
+        Assert.Equal("Desc", result.Description);
         _mockSerieRepository.Verify(r => r.AddAsync(It.IsAny<Serie>(), It.IsAny<CancellationToken>()), Times.Once);
         _mockUnitOfWork.Verify(u => u.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);
     }
@@ -129,47 +127,62 @@ public class SerieServiceTests
     [Fact]
     public async Task UpdateSerieAsync_ValidData_UpdatesPropertiesAndMaps()
     {
-        var serieId = Guid.NewGuid();
-        var serie = Serie.Create(_userId, "Old", new DateOnly(2023,1,1));
+        var serie = Serie.Create(_userId, "Old", new DateOnly(2023, 1, 1));
         var updateDto = new UpdateSerieDto { Title = "Updated", Description = "Desc" };
 
-        _mockSerieRepository.Setup(r => r.GetByIdAsync(serieId, It.IsAny<CancellationToken>())).ReturnsAsync(serie);
-        _mockUnitOfWork.Setup(u => u.SaveChangesAsync(It.IsAny<CancellationToken>())).ReturnsAsync(1);
-        _mockSerieRepository.Setup(r => r.GetByIdWithSeasonsAndEpisodesAsync(serieId, It.IsAny<CancellationToken>())).ReturnsAsync(serie);
+        _mockSerieRepository
+            .Setup(r => r.GetByIdAsync(serie.Id, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(serie);
+        _mockSerieRepository
+            .Setup(r => r.GetByIdWithSeasonsAndEpisodesAsync(serie.Id, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(serie);
+        _mockUnitOfWork
+            .Setup(u => u.SaveChangesAsync(It.IsAny<CancellationToken>()))
+            .ReturnsAsync(1);
 
-        var mappedDto = new SerieDetailsDto { Title = "Updated" };
-        _mockMapper.Setup(m => m.Map<SerieDetailsDto>(serie)).Returns(mappedDto);
-
-        var result = await _serieService.UpdateSerieAsync(serieId, updateDto);
+        var result = await _serieService.UpdateSerieAsync(serie.Id, updateDto);
 
         Assert.Equal("Updated", result.Title);
+        Assert.Equal("Desc", result.Description);
         _mockSerieRepository.Verify(r => r.Update(serie), Times.Once);
+        _mockUnitOfWork.Verify(u => u.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);
     }
 
     [Fact]
     public async Task UpdateSerieAsync_WrongUser_ThrowsForbidden()
     {
-        var serie = Serie.Create(Guid.NewGuid(), "Serie", new DateOnly(2023,1,1));
-        _mockSerieRepository.Setup(r => r.GetByIdAsync(serie.Id, It.IsAny<CancellationToken>())).ReturnsAsync(serie);
+        var serie = Serie.Create(Guid.NewGuid(), "Serie", new DateOnly(2023, 1, 1));
 
-        await Assert.ThrowsAsync<ForbiddenException>(() => _serieService.UpdateSerieAsync(serie.Id, new UpdateSerieDto()));
+        _mockSerieRepository
+            .Setup(r => r.GetByIdAsync(serie.Id, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(serie);
+
+        await Assert.ThrowsAsync<ForbiddenException>(
+            () => _serieService.UpdateSerieAsync(serie.Id, new UpdateSerieDto()));
     }
 
     [Fact]
     public async Task UpdateSerieAsync_NotFound_ThrowsNotFound()
     {
-        _mockSerieRepository.Setup(r => r.GetByIdAsync(It.IsAny<Guid>(), It.IsAny<CancellationToken>())).ReturnsAsync((Serie?)null);
+        _mockSerieRepository
+            .Setup(r => r.GetByIdAsync(It.IsAny<Guid>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync((Serie?)null);
 
-        await Assert.ThrowsAsync<NotFoundException>(() => _serieService.UpdateSerieAsync(Guid.NewGuid(), new UpdateSerieDto()));
+        await Assert.ThrowsAsync<NotFoundException>(
+            () => _serieService.UpdateSerieAsync(Guid.NewGuid(), new UpdateSerieDto()));
     }
 
     [Fact]
     public async Task DeleteSerieAsync_DeletesSerie_WhenExists()
     {
-        var serie = Serie.Create(_userId, "Serie", new DateOnly(2024,1,1));
+        var serie = Serie.Create(_userId, "Serie", new DateOnly(2024, 1, 1));
 
-        _mockSerieRepository.Setup(r => r.GetByIdAsync(serie.Id, It.IsAny<CancellationToken>())).ReturnsAsync(serie);
-        _mockUnitOfWork.Setup(u => u.SaveChangesAsync(It.IsAny<CancellationToken>())).ReturnsAsync(1);
+        _mockSerieRepository
+            .Setup(r => r.GetByIdAsync(serie.Id, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(serie);
+        _mockUnitOfWork
+            .Setup(u => u.SaveChangesAsync(It.IsAny<CancellationToken>()))
+            .ReturnsAsync(1);
 
         await _serieService.DeleteSerieAsync(serie.Id);
 
@@ -180,17 +193,38 @@ public class SerieServiceTests
     [Fact]
     public async Task DeleteSerieAsync_NotFound_ThrowsNotFound()
     {
-        _mockSerieRepository.Setup(r => r.GetByIdAsync(It.IsAny<Guid>(), It.IsAny<CancellationToken>())).ReturnsAsync((Serie?)null);
+        _mockSerieRepository
+            .Setup(r => r.GetByIdAsync(It.IsAny<Guid>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync((Serie?)null);
 
-        await Assert.ThrowsAsync<NotFoundException>(() => _serieService.DeleteSerieAsync(Guid.NewGuid()));
+        await Assert.ThrowsAsync<NotFoundException>(
+            () => _serieService.DeleteSerieAsync(Guid.NewGuid()));
+    }
+
+    [Fact]
+    public async Task DeleteSerieAsync_WrongUser_ThrowsForbidden()
+    {
+        var serie = Serie.Create(Guid.NewGuid(), "Serie", new DateOnly(2024, 1, 1));
+
+        _mockSerieRepository
+            .Setup(r => r.GetByIdAsync(serie.Id, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(serie);
+
+        await Assert.ThrowsAsync<ForbiddenException>(
+            () => _serieService.DeleteSerieAsync(serie.Id));
     }
 
     [Fact]
     public async Task UpdateSerieStatusAsync_ValidStatus_UpdatesAndSaves()
     {
-        var serie = Serie.Create(_userId, "Serie", new DateOnly(2024,1,1));
-        _mockSerieRepository.Setup(r => r.GetByIdAsync(serie.Id, It.IsAny<CancellationToken>())).ReturnsAsync(serie);
-        _mockUnitOfWork.Setup(u => u.SaveChangesAsync(It.IsAny<CancellationToken>())).ReturnsAsync(1);
+        var serie = Serie.Create(_userId, "Serie", new DateOnly(2024, 1, 1));
+
+        _mockSerieRepository
+            .Setup(r => r.GetByIdAsync(serie.Id, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(serie);
+        _mockUnitOfWork
+            .Setup(u => u.SaveChangesAsync(It.IsAny<CancellationToken>()))
+            .ReturnsAsync(1);
 
         await _serieService.UpdateSerieStatusAsync(serie.Id, "Watched");
 
@@ -201,15 +235,21 @@ public class SerieServiceTests
     [Fact]
     public async Task UpdateSerieStatusAsync_InvalidStatus_ThrowsValidation()
     {
-        await Assert.ThrowsAsync<ValidationException>(() => _serieService.UpdateSerieStatusAsync(Guid.NewGuid(), "InvalidStatus"));
+        await Assert.ThrowsAsync<ValidationException>(
+            () => _serieService.UpdateSerieStatusAsync(Guid.NewGuid(), "InvalidStatus"));
     }
 
     [Fact]
     public async Task RateSerieAsync_ValidRating_UpdatesAndSaves()
     {
-        var serie = Serie.Create(_userId, "Serie", new DateOnly(2024,1,1));
-        _mockSerieRepository.Setup(r => r.GetByIdAsync(serie.Id, It.IsAny<CancellationToken>())).ReturnsAsync(serie);
-        _mockUnitOfWork.Setup(u => u.SaveChangesAsync(It.IsAny<CancellationToken>())).ReturnsAsync(1);
+        var serie = Serie.Create(_userId, "Serie", new DateOnly(2024, 1, 1));
+
+        _mockSerieRepository
+            .Setup(r => r.GetByIdAsync(serie.Id, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(serie);
+        _mockUnitOfWork
+            .Setup(u => u.SaveChangesAsync(It.IsAny<CancellationToken>()))
+            .ReturnsAsync(1);
 
         await _serieService.RateSerieAsync(serie.Id, 8.5);
 

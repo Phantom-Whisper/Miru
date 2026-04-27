@@ -1,9 +1,8 @@
-﻿using Miru.Domain;
-using Miru.Shared.Common;
+﻿using Miru.Shared.Common;
 using Miru.Shared.Common.Enums;
 using Miru.Shared.DTOs.Series;
 
-namespace Miru.Shared.Services;
+namespace Miru.Application.Interfaces;
 
 public interface ISerieService
 {

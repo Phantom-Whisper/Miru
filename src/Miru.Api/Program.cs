@@ -2,9 +2,9 @@ using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Miru.Api.Middleware;
+using Miru.Application.Interfaces;
 using Miru.Application.Mappings;
 using Miru.Application.Services;
-using Miru.Shared.Services;
 using Miru.Domain.Entities;
 using Miru.Infrastructure;
 using Miru.Infrastructure.Persistence.UnitOfWork;
@@ -33,8 +33,6 @@ builder.Services
     .AddRoles<IdentityRole<Guid>>()
     .AddEntityFrameworkStores<MiruDbContext>();
 
-// AutoMapper
-builder.Services.AddAutoMapper(_ => { }, typeof(MappingProfile));
 
 // Add services to the container.
 builder.Services.AddControllers()

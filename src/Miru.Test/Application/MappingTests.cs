@@ -1,43 +1,11 @@
-﻿using AutoMapper;
-using Microsoft.Extensions.Logging;
-using Miru.Application.Mappings;
+﻿using Miru.Application.Mappings;
 using Miru.Domain.Entities;
 using Miru.Shared.Common.Enums;
-using Miru.Shared.DTOs.Episodes;
-using Miru.Shared.DTOs.Movies;
-using Miru.Shared.DTOs.Seasons;
-using Miru.Shared.DTOs.Series;
 
 namespace Miru.Test.Application;
 
 public class MappingTests
 {
-    private readonly IMapper _mapper;
-
-    public MappingTests()
-    {
-        var configuration = new MapperConfiguration(cfg =>
-        {
-            cfg.AddProfile<MappingProfile>();
-        }, new LoggerFactory());
-
-        configuration.AssertConfigurationIsValid();
-
-        _mapper = configuration.CreateMapper();
-    }
-
-
-    [Fact]
-    public void MappingProfile_Configuration_IsValid()
-    {
-        var configuration = new MapperConfiguration(
-            cfg => cfg.AddProfile<MappingProfile>(),
-            new LoggerFactory()
-        );
-
-        configuration.AssertConfigurationIsValid();
-    }
-
     [Fact]
     public void Movie_To_MovieDto_Should_Map_Correctly()
     {
@@ -49,11 +17,10 @@ public class MappingTests
             "Dream infiltration",
             "https://poster.jpg"
         );
-
         movie.UpdateStatus(MediaStatus.Watched);
         movie.SetRating(9.0);
 
-        var dto = _mapper.Map<MovieDto>(movie);
+        var dto = movie.ToDto();
 
         Assert.Equal(movie.Id, dto.Id);
         Assert.Equal("Inception", dto.Title);
@@ -73,7 +40,7 @@ public class MappingTests
             "Space exploration"
         );
 
-        var dto = _mapper.Map<MovieDetailsDto>(movie);
+        var dto = movie.ToDetailsDto();
 
         Assert.Equal(movie.Id, dto.Id);
         Assert.Equal(169, dto.Duration);
@@ -84,14 +51,9 @@ public class MappingTests
     [Fact]
     public void Episode_To_EpisodeDto_Should_Map_Duration()
     {
-        var episode = Episode.Create(
-            1,
-            "Pilot",
-            TimeSpan.FromMinutes(58),
-            Guid.NewGuid()
-        );
+        var episode = Episode.Create(1, "Pilot", TimeSpan.FromMinutes(58), Guid.NewGuid());
 
-        var dto = _mapper.Map<EpisodeDto>(episode);
+        var dto = episode.ToDto();
 
         Assert.Equal(1, dto.EpisodeNumber);
         Assert.Equal("Pilot", dto.Title);
@@ -102,16 +64,13 @@ public class MappingTests
     public void Season_To_SeasonDto_Should_Calculate_Progress()
     {
         var season = Season.Create(1, new DateOnly(2024, 1, 1), Guid.NewGuid());
-
         var ep1 = Episode.Create(1, "Ep1", TimeSpan.FromMinutes(45), season.Id);
         ep1.MarkAsWatched();
-
         var ep2 = Episode.Create(2, "Ep2", TimeSpan.FromMinutes(45), season.Id);
-
         season.AddEpisode(ep1);
         season.AddEpisode(ep2);
 
-        var dto = _mapper.Map<SeasonDto>(season);
+        var dto = season.ToDto();
 
         Assert.Equal(2, dto.EpisodesCount);
         Assert.Equal(1, dto.WatchedEpisodesCount);
@@ -123,7 +82,7 @@ public class MappingTests
     {
         var season = Season.Create(1, new DateOnly(2024, 1, 1), Guid.NewGuid());
 
-        var dto = _mapper.Map<SeasonDto>(season);
+        var dto = season.ToDto();
 
         Assert.Equal(0, dto.EpisodesCount);
         Assert.Equal(0, dto.WatchedEpisodesCount);
@@ -136,7 +95,7 @@ public class MappingTests
         var season = Season.Create(1, new DateOnly(2024, 1, 1), Guid.NewGuid());
         season.AddEpisode(Episode.Create(1, "Ep1", TimeSpan.FromMinutes(45), season.Id));
 
-        var dto = _mapper.Map<SeasonDetailsDto>(season);
+        var dto = season.ToDetailsDto();
 
         Assert.Single(dto.Episodes);
     }
@@ -144,21 +103,16 @@ public class MappingTests
     [Fact]
     public void Serie_To_SerieDto_Should_Calculate_All_Statistics()
     {
-        var userId = Guid.NewGuid();
-        var serie = Serie.Create(userId, "Breaking Bad", new DateOnly(2008, 1, 20));
-
+        var serie = Serie.Create(Guid.NewGuid(), "Breaking Bad", new DateOnly(2008, 1, 20));
         var season1 = Season.Create(1, new DateOnly(2008, 1, 20), serie.Id);
-
         var ep1 = Episode.Create(1, "Ep1", TimeSpan.FromMinutes(45), season1.Id);
         ep1.MarkAsWatched();
-
         var ep2 = Episode.Create(2, "Ep2", TimeSpan.FromMinutes(45), season1.Id);
-
         season1.AddEpisode(ep1);
         season1.AddEpisode(ep2);
         serie.AddSeason(season1);
 
-        var dto = _mapper.Map<SerieDto>(serie);
+        var dto = serie.ToDto();
 
         Assert.Equal("Breaking Bad", dto.Title);
         Assert.Equal(1, dto.SeasonsCount);
@@ -172,7 +126,7 @@ public class MappingTests
     {
         var serie = Serie.Create(Guid.NewGuid(), "Empty Serie", new DateOnly(2024, 1, 1));
 
-        var dto = _mapper.Map<SerieDto>(serie);
+        var dto = serie.ToDto();
 
         Assert.Equal(0, dto.TotalEpisodesCount);
         Assert.Equal(0, dto.WatchedEpisodesCount);
@@ -185,7 +139,7 @@ public class MappingTests
         var serie = Serie.Create(Guid.NewGuid(), "Test Serie", new DateOnly(2024, 1, 1));
         serie.AddSeason(Season.Create(1, new DateOnly(2024, 1, 1), serie.Id));
 
-        var dto = _mapper.Map<SerieDetailsDto>(serie);
+        var dto = serie.ToDetailsDto();
 
         Assert.Single(dto.Seasons);
     }

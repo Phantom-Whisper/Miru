@@ -1,14 +1,14 @@
-﻿using AutoMapper;
-using Miru.Application.Exceptions;
+﻿using Miru.Application.Exceptions;
+using Miru.Application.Interfaces;
+using Miru.Application.Mappings;
 using Miru.Shared.DTOs.Seasons;
-using Miru.Shared.Services;
 using Miru.Domain.Entities;
 using Miru.Domain.Exceptions;
 using Miru.Infrastructure.Persistence.UnitOfWork;
 
 namespace Miru.Application.Services;
 
-public class SeasonService(IUnitOfWork unitOfWork, IMapper mapper, ICurrentUserService currentUserService)
+public class SeasonService(IUnitOfWork unitOfWork, ICurrentUserService currentUserService)
     : ISeasonService
 {
     public async Task<IEnumerable<SeasonDto>> GetSeasonsBySerieIdAsync(
@@ -26,7 +26,7 @@ public class SeasonService(IUnitOfWork unitOfWork, IMapper mapper, ICurrentUserS
         
         var seasons = await unitOfWork.Seasons.GetBySerieIdAsync(serieId, cancellationToken);
         
-        return mapper.Map<IEnumerable<SeasonDto>>(seasons);
+        return seasons.Select(season => season.ToDto());
     }
     
     public async Task<SeasonDetailsDto?> GetSeasonByIdAsync(
@@ -48,7 +48,7 @@ public class SeasonService(IUnitOfWork unitOfWork, IMapper mapper, ICurrentUserS
         if (season == null || season.SerieId != serieId)
             return null;
         
-        return mapper.Map<SeasonDetailsDto>(season);
+        return season.ToDetailsDto();
     }
     
     public async Task<SeasonDetailsDto> AddSeasonToSerieAsync(
@@ -84,7 +84,8 @@ public class SeasonService(IUnitOfWork unitOfWork, IMapper mapper, ICurrentUserS
         await unitOfWork.SaveChangesAsync(cancellationToken);
         
         var createdSeason = await unitOfWork.Seasons.GetByIdWithEpisodesAsync(season.Id, cancellationToken);
-        return mapper.Map<SeasonDetailsDto>(createdSeason);
+        
+        return createdSeason.ToDetailsDto();
     }
     
     public async Task<SeasonDetailsDto> UpdateSeasonAsync(
@@ -117,7 +118,7 @@ public class SeasonService(IUnitOfWork unitOfWork, IMapper mapper, ICurrentUserS
         await unitOfWork.SaveChangesAsync(cancellationToken);
         
         var updatedSeason = await unitOfWork.Seasons.GetByIdWithEpisodesAsync(seasonId, cancellationToken);
-        return mapper.Map<SeasonDetailsDto>(updatedSeason);
+        return updatedSeason.ToDetailsDto();
     }
     
     public async Task DeleteSeasonAsync(

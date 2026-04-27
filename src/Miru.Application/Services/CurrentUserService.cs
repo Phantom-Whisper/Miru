@@ -1,7 +1,7 @@
 ﻿using System.Security.Claims;
 using Microsoft.AspNetCore.Http;
 using Miru.Application.Exceptions;
-using Miru.Shared.Services;
+using Miru.Application.Interfaces;
 
 namespace Miru.Application.Services;
 
