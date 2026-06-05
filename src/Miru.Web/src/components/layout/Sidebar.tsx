@@ -5,8 +5,8 @@ const menu = [
     { label: "Home", icon: Home },
     { label: "Movies", icon: Film},
     { label: "Series", icon: Tv},
-    { label: "To Watch", icon: ClipboardClock },
     { label: "Watching", icon: Play },
+    { label: "To Watch", icon: ClipboardClock },
     { label: "Watched", icon: CircleCheck },
 ];
 

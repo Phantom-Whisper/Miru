@@ -1,4 +1,4 @@
-import {Bell, CircleUserRound, Search} from "lucide-react";
+import {CircleUserRound, Search} from "lucide-react";
 
 function Navbar() {
     return (
@@ -12,8 +12,8 @@ function Navbar() {
                     />
                 </div>
 
-                <Bell />
-                <CircleUserRound />
+                <CircleUserRound
+                    className="hover:bg-zinc-800 rounded-lg cursor-pointer"/>
             </div>
         </header>
     )
