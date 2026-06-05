@@ -1,3 +1,14 @@
 {
+  "hero.greeting": "Salut utilisateur",
+  "hero.subtiltle": "Reprends là où tu t’es arrêté",
+  "sidebar.home": "Home",
+  "sidebar.movies": "Movies",
+  "sidebar.series": "Series",
+  "sidebar.towatch": "To Watch",
+  "sidebar.watching": "Watching",
+  "sidebar.watched": "Watched",
+  "contentrows.continueWatching": "En train de regarder",
+  "contentrows.towatch": "A regarder",
+  "contentrows.watched": "Ce que vous avez regardé",
   "navbar.input.placeholder": "Rechercher..."
 }

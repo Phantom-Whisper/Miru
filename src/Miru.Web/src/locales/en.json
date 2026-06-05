@@ -1,3 +1,14 @@
 {
+  "home.greeting": "Hello user",
+  "home.subtitle": "Continue where you left off",
+  "sidebar.home": "Home",
+  "sidebar.movies": "Movies",
+  "sidebar.series": "Series",
+  "sidebar.towatch": "To Watch",
+  "sidebar.watching": "Watching",
+  "sidebar.watched": "Watched",
+  "contentrows.continueWatching": "Watching",
+  "contentrows.towatch": "To Watch",
+  "contentrows.watched": "Your Last Watched",
   "navbar.input.placeholder": "Search..."
 }
