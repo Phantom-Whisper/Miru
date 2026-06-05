@@ -10,7 +10,7 @@
       - .env
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
-      - ConnectionStrings__MiruDb=${DB_CONNECTIONSTRING}
+      - ConnectionStrings__MiruDb=${DB_CONNECTION_STRING}
       - AdminUser__Email=${ADMIN_EMAIL}
       - AdminUser__Password=${ADMIN_PASSWORD}
   
