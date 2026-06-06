@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.1](https://github.com/Phantom-Whisper/Miru/compare/v1.0.0...v1.0.1) (2026-06-06)
+
+
+### Bug Fixes
+
+* ensure Swagger displays Git tag version with Docker Compose and IDE runtime injection via APP_VERSION ([e82a96c](https://github.com/Phantom-Whisper/Miru/commit/e82a96cf383a0dbed6982069f579faf8b9c7a586))
+
 ## 1.0.0 (2026-06-05)
 
 
