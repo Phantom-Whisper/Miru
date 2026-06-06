@@ -41,13 +41,10 @@ builder.Services.AddControllers()
 
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 
-var version = Assembly.GetExecutingAssembly()
-    .GetName()
-    .Version;
-
-var cleanVersion = version is null
-    ? "unknown"
-    : $"{version.Major}.{version.Minor}.{version.Build}";
+var version =
+    Environment.GetEnvironmentVariable("APP_VERSION")
+    ?? builder.Configuration["APP_VERSION"]
+    ?? "dev";
 
 builder.Services.AddOpenApiDocument(options =>
 {
@@ -56,7 +53,7 @@ builder.Services.AddOpenApiDocument(options =>
         document.Info = new OpenApiInfo
         {
             
-            Version = cleanVersion,
+            Version = version,
             Title = "Miru API",
             Description = "Miru API",
             TermsOfService = "None",

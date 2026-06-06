@@ -9,6 +9,7 @@
     env_file:
       - .env
     environment:
+      - APP_VERSION=${APP_VERSION}
       - ASPNETCORE_ENVIRONMENT=Development
       - ConnectionStrings__MiruDb=${DB_CONNECTION_STRING}
       - AdminUser__Email=${ADMIN_EMAIL}

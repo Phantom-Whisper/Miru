@@ -11,11 +11,14 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Extract version
-        run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_ENV
+        run: echo "APP_VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_ENV
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: 8.0
+          dotnet-version: 10.0
       - name: Build API
         run: |
-          dotnet publish ./Miru.Api/Miru.Api.csproj -c Release -o out /p:Version=${{ env.VERSION }}
+          dotnet publish ./src/Miru.Api/Miru.Api.csproj \
+            -c Release \
+            -o out \
+            /p:APP_VERSION=${GITHUB_REF#refs/tags/v}
